@@ -1,0 +1,13 @@
+preprocess:
+  sample_rate: 16000
+  chunk_sec: 10
+
+detectors:
+  wav2vec2:
+    model_id: "Zeyadd-Mostaffa/Deepfake-Audio-Detection-v1"
+    device: "cpu"
+    weight: 0.75
+  spectral:
+    weight: 0.25
+
+threshold: 0.5

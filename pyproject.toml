@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "aiblock"
+version = "0.1.0"
+description = "Detect AI-generated audio on YouTube and Spotify"
+requires-python = ">=3.10"
+dependencies = [
+    "yt-dlp>=2024.1",
+    "spotdl>=4.2",
+    "librosa>=0.10",
+    "soundfile>=0.12",
+    "numpy>=1.24",
+    "torch>=2.0",
+    "transformers>=4.40",
+    "click>=8.1",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+aiblock = "aiblock.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
