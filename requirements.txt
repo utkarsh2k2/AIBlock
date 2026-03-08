@@ -1,10 +1,34 @@
+# Core
 yt-dlp>=2024.1
 spotdl>=4.2
 librosa>=0.10
 soundfile>=0.12
 numpy>=1.24
-torch>=2.0
-transformers>=4.40
 click>=8.1
 pyyaml>=6.0
-pytest>=7.0
+pydantic-settings>=2.0
+
+# Detection models
+torch>=2.0
+transformers>=4.40
+
+# REST API
+fastapi>=0.110
+uvicorn[standard]>=0.29
+sqlalchemy[asyncio]>=2.0
+asyncpg>=0.29
+psycopg2-binary>=2.9
+redis>=5.0
+celery[redis]>=5.3
+alembic>=1.13
+boto3>=1.34
+stripe>=8.0
+
+# MCP server
+mcp[cli]>=1.0
+
+# Testing
+pytest>=8.0
+pytest-asyncio>=0.23
+httpx>=0.27
+anyio>=4.0

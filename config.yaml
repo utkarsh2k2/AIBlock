@@ -2,12 +2,10 @@ preprocess:
   sample_rate: 16000
   chunk_sec: 10
 
+# Default: spectral-only (fast, no model download).
+# Enable wav2vec2 via --model flag on the CLI, or use_model=true in the API.
 detectors:
-  wav2vec2:
-    model_id: "Zeyadd-Mostaffa/Deepfake-Audio-Detection-v1"
-    device: "cpu"
-    weight: 0.75
   spectral:
-    weight: 0.25
+    weight: 1.0
 
 threshold: 0.5

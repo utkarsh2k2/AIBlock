@@ -1,0 +1,148 @@
+# AIBlock local development stack.
+# Start everything: docker compose up
+# Detached:         docker compose up -d
+# Scale workers:    docker compose up --scale worker=4
+
+version: "3.9"
+
+x-app-env: &app-env
+  DATABASE_URL: postgresql+asyncpg://aiblock:aiblock@postgres:5432/aiblock
+  REDIS_URL: redis://redis:6379/0
+  ENVIRONMENT: development
+  DEBUG: "true"
+  # Add Stripe keys here or via .env file
+  STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+  STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+  STRIPE_PRO_PRICE_ID: ${STRIPE_PRO_PRICE_ID:-}
+  STRIPE_ENTERPRISE_PRICE_ID: ${STRIPE_ENTERPRISE_PRICE_ID:-}
+  # S3 — leave empty to disable S3 audio caching in development
+  S3_BUCKET: ${S3_BUCKET:-aiblock-audio}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+  S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}  # set to http://minio:9000 to use local MinIO
+
+services:
+
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aiblock
+      POSTGRES_PASSWORD: aiblock
+      POSTGRES_DB: aiblock
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aiblock"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports:
+      - "6379:6379"
+
+  # ── MinIO (optional local S3) ───────────────────────────────────────────────
+  # Uncomment and set S3_ENDPOINT_URL=http://minio:9000 to use local S3
+  # minio:
+  #   image: minio/minio:latest
+  #   command: server /data --console-address ":9001"
+  #   environment:
+  #     MINIO_ROOT_USER: minioadmin
+  #     MINIO_ROOT_PASSWORD: minioadmin
+  #   volumes:
+  #     - minio_data:/data
+  #   ports:
+  #     - "9000:9000"
+  #     - "9001:9001"
+
+  # ── Application ─────────────────────────────────────────────────────────────
+
+  migrations:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    command: >
+      sh -c "
+        echo 'Waiting for postgres...' &&
+        sleep 3 &&
+        DATABASE_URL=postgresql+psycopg2://aiblock:aiblock@postgres:5432/aiblock
+        alembic upgrade head
+      "
+    environment:
+      <<: *app-env
+      DATABASE_URL: postgresql+psycopg2://aiblock:aiblock@postgres:5432/aiblock
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    environment: *app-env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    volumes:
+      - ./src:/app/src:ro  # live reload in dev (remove in prod)
+      - ./config.yaml:/app/config.yaml:ro
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    environment: *app-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    volumes:
+      - ./src:/app/src:ro
+      - ./config.yaml:/app/config.yaml:ro
+    # Uncomment to run multiple workers in development:
+    # deploy:
+    #   replicas: 2
+
+  # ── Monitoring (optional) ────────────────────────────────────────────────────
+  # Flower: Celery task monitoring UI at http://localhost:5555
+  flower:
+    image: mher/flower:2.0
+    command: celery flower --broker=redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  # minio_data:

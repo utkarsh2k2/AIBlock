@@ -15,3 +15,11 @@ class PlatformAdapter(ABC):
     @abstractmethod
     def fetch(self, url: str, output_dir: Path) -> Path:
         """Download audio from `url`, save under `output_dir`, return file path."""
+
+    def get_metadata(self, url: str) -> dict:
+        """Extract track metadata without downloading audio.
+
+        Returns a dict with keys: title, uploader, description, duration (seconds).
+        Override in subclasses. Default returns empty dict — never raises.
+        """
+        return {}

@@ -33,9 +33,11 @@ class TestSpectralDetector:
             assert 0.0 <= result.score <= 1.0
             assert 0.0 <= result.confidence <= 1.0
 
-    def test_sine_scores_higher_than_noise(self):
-        """Pure sine is maximally flat and monotone — should look more AI-like."""
+    def test_noise_scores_higher_than_sine(self):
+        """White noise has HIGH spectral flatness (all frequencies equal power).
+        A pure sine has LOW spectral flatness (power concentrated at one frequency).
+        The spectral heuristic uses flatness as an AI signal, so noise should score higher.
+        """
         sine_result = self.detector.detect(_sine_wave(), sr=16000)
         noise_result = self.detector.detect(_white_noise(), sr=16000)
-        # Sine → high flatness → higher AI score than white noise
-        assert sine_result.score > noise_result.score
+        assert noise_result.score > sine_result.score

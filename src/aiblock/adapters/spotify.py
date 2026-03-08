@@ -35,7 +35,6 @@ class SpotifyAdapter(PlatformAdapter):
                 f"spotdl failed (exit {result.returncode}):\n{result.stderr}"
             )
 
-        # Return the first mp3 found in output_dir (single track expected for MVP)
         mp3_files = sorted(output_dir.glob("*.mp3"))
         if not mp3_files:
             raise FileNotFoundError(
@@ -44,3 +43,30 @@ class SpotifyAdapter(PlatformAdapter):
             )
 
         return mp3_files[0]
+
+    def get_metadata(self, url: str) -> dict:
+        """Extract Spotify track metadata without downloading audio.
+
+        Uses spotdl's Python API to resolve track info from Spotify.
+        Falls back to empty dict on any failure.
+        """
+        try:
+            from spotdl.utils.spotify import SpotifyClient
+            from spotdl import Song
+
+            # SpotifyClient.init is idempotent — safe to call multiple times
+            SpotifyClient.init(
+                client_id="",
+                client_secret="",
+                user_auth=False,
+                no_cache=True,
+            )
+            song = Song.from_url(url)
+            return {
+                "title": song.name or "",
+                "uploader": song.artist or "",
+                "description": f"Album: {song.album_name}" if song.album_name else "",
+                "duration": song.duration,
+            }
+        except Exception:
+            return {}

@@ -4,23 +4,68 @@ build-backend = "setuptools.backends.legacy:build"
 
 [project]
 name = "aiblock"
-version = "0.1.0"
-description = "Detect AI-generated audio on YouTube and Spotify"
-requires-python = ">=3.10"
+version = "1.0.0"
+description = "Detect AI-generated audio (and soon: video, text, image) on YouTube, Spotify, and more."
+requires-python = ">=3.11"
+
+# Core deps — always installed
 dependencies = [
     "yt-dlp>=2024.1",
     "spotdl>=4.2",
     "librosa>=0.10",
     "soundfile>=0.12",
     "numpy>=1.24",
-    "torch>=2.0",
-    "transformers>=4.40",
     "click>=8.1",
     "pyyaml>=6.0",
+    "pydantic-settings>=2.0",
+]
+
+[project.optional-dependencies]
+# Detection models (heavy — GPU optional, CPU-only supported)
+models = [
+    "torch>=2.0",
+    "transformers>=4.40",
+]
+
+# REST API + async workers
+api = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.29",
+    "psycopg2-binary>=2.9",
+    "redis>=5.0",
+    "celery[redis]>=5.3",
+    "alembic>=1.13",
+    "boto3>=1.34",
+    "stripe>=8.0",
+]
+
+# MCP server (AI agent integration)
+mcp = [
+    "mcp[cli]>=1.0",
+]
+
+# Full production install
+production = [
+    "aiblock[models,api,mcp]",
+]
+
+# Development and testing
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+    "anyio>=4.0",
 ]
 
 [project.scripts]
-aiblock = "aiblock.cli:main"
+aiblock     = "aiblock.cli:main"
+aiblock-mcp = "aiblock.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
