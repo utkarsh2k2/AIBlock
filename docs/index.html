@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIBlock — AI Content Detection API</title>
+  <meta name="description" content="Detect AI-generated audio, video, images and text from YouTube, Spotify and more. Fast, accurate, and developer-friendly." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: #1e1e2e;
+      --accent: #7c3aed;
+      --accent-light: #a855f7;
+      --accent-glow: rgba(124, 58, 237, 0.25);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --code-bg: #1e1e2e;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,15,0.85);
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--accent-light); }
+
+    nav ul {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    nav ul a {
+      color: var(--muted);
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: var(--text); text-decoration: none; }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #fff !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-cta:hover {
+      background: var(--accent-light) !important;
+      box-shadow: 0 0 20px var(--accent-glow);
+      text-decoration: none !important;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 5rem 1.5rem 4rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.35rem 1rem;
+      font-size: 0.8rem;
+      color: var(--accent-light);
+      margin-bottom: 2rem;
+      font-weight: 500;
+    }
+
+    .badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 .gradient {
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-light);
+      box-shadow: 0 0 24px var(--accent-glow);
+      text-decoration: none;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent-light);
+      text-decoration: none;
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      padding: 2.5rem 1.5rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .stat { text-align: center; }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a855f7, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* FEATURES */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent-light);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 3vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      text-align: center;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 3.5rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+
+    .feature-icon {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p { font-size: 0.9rem; color: var(--muted); }
+
+    /* SOURCES */
+    .sources-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .source-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .source-chip:hover {
+      border-color: var(--accent-light);
+      color: var(--accent-light);
+    }
+
+    /* CODE */
+    .code-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      max-width: 720px;
+      margin: 3rem auto 0;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #22c55e; }
+
+    .code-lang {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    pre {
+      padding: 1.5rem;
+      overflow-x: auto;
+      font-size: 0.875rem;
+      line-height: 1.7;
+    }
+
+    code { font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace; }
+
+    .tok-kw  { color: #c084fc; }
+    .tok-str { color: #86efac; }
+    .tok-fn  { color: #67e8f9; }
+    .tok-cmt { color: #4b5563; }
+    .tok-num { color: #fbbf24; }
+    .tok-key { color: #e2e8f0; }
+
+    /* PRICING */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .pricing-card.featured {
+      border-color: var(--accent);
+      box-shadow: 0 0 40px var(--accent-glow);
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+    }
+
+    .plan-name { font-size: 0.9rem; color: var(--muted); font-weight: 500; margin-bottom: 0.5rem; }
+
+    .plan-price {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 0.25rem;
+    }
+
+    .plan-price sup { font-size: 1.25rem; vertical-align: top; margin-top: 0.5rem; display: inline-block; }
+    .plan-price sub { font-size: 0.9rem; font-weight: 400; color: var(--muted); }
+    .plan-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+    .plan-features { list-style: none; margin-bottom: 2rem; }
+    .plan-features li {
+      font-size: 0.875rem;
+      color: var(--muted);
+      padding: 0.4rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .plan-features li::before { content: '✓'; color: var(--accent-light); font-weight: 700; }
+
+    .plan-btn {
+      display: block;
+      text-align: center;
+      padding: 0.75rem;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .plan-btn-outline {
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .plan-btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent-light);
+      text-decoration: none;
+    }
+
+    .plan-btn-solid {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .plan-btn-solid:hover {
+      background: var(--accent-light);
+      text-decoration: none;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      text-align: center;
+      padding: 5rem 1.5rem;
+      background: linear-gradient(180deg, var(--bg) 0%, rgba(124,58,237,0.08) 50%, var(--bg) 100%);
+    }
+
+    .cta-section h2 {
+      font-size: clamp(1.8rem, 4vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p { color: var(--muted); margin-bottom: 2.5rem; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      gap: 1rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    footer .logo { font-size: 1rem; }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      nav ul { display: none; }
+      .stats { gap: 1.5rem; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">AI<span>Block</span></div>
+  <ul>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#api">API</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="https://github.com/utkarsh2k2/AIBlock" target="_blank">GitHub</a></li>
+  </ul>
+  <a href="#pricing" class="nav-cta btn">Get Started</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">Now in Beta &mdash; AI Detection API</div>
+  <h1>
+    Detect <span class="gradient">AI-Generated</span><br />
+    Content at Scale
+  </h1>
+  <p class="subtitle">
+    Analyse audio, video, images and text from YouTube, Spotify, and 40+ sources.
+    Powered by state-of-the-art transformer models.
+  </p>
+  <div class="hero-actions">
+    <a href="#api" class="btn btn-primary">View the API &rarr;</a>
+    <a href="https://github.com/utkarsh2k2/AIBlock" target="_blank" class="btn btn-secondary">
+      &#9733; Star on GitHub
+    </a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-number">4</div>
+    <div class="stat-label">Content Types</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">40+</div>
+    <div class="stat-label">Supported Sources</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">&lt;2s</div>
+    <div class="stat-label">Avg. Detection Time</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">99.9%</div>
+    <div class="stat-label">API Uptime SLA</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-label">What we detect</div>
+  <h2 class="section-title">One API. All modalities.</h2>
+  <p class="section-sub">Submit a URL or raw content and get a structured detection report in seconds.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🎵</div>
+      <h3>AI Audio Detection</h3>
+      <p>Identify AI-generated or voice-cloned audio from YouTube, Spotify, SoundCloud, and more using deep spectral analysis.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎬</div>
+      <h3>AI Video Detection</h3>
+      <p>Frame-level deepfake analysis combined with audio-visual inconsistency scoring for comprehensive video verification.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🖼️</div>
+      <h3>AI Image Detection</h3>
+      <p>Detect diffusion-model artifacts, GAN fingerprints, and manipulation traces across JPEG, PNG, and WebP images.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📝</div>
+      <h3>AI Text Detection</h3>
+      <p>Classify GPT, Claude, Gemini, and other LLM-generated text with per-sentence confidence scores and watermark analysis.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Async Job Queue</h3>
+      <p>Submit long-running jobs via Celery workers. Poll job status or receive webhooks when results are ready.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔌</div>
+      <h3>MCP Server</h3>
+      <p>Native Model Context Protocol integration — plug AIBlock directly into Claude, Cursor, or any MCP-compatible AI agent.</p>
+    </div>
+  </div>
+
+  <!-- SOURCES -->
+  <div style="margin-top: 3.5rem; text-align: center;">
+    <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Supported sources include</p>
+    <div class="sources-grid">
+      <span class="source-chip">YouTube</span>
+      <span class="source-chip">Spotify</span>
+      <span class="source-chip">SoundCloud</span>
+      <span class="source-chip">TikTok</span>
+      <span class="source-chip">Instagram</span>
+      <span class="source-chip">Twitter / X</span>
+      <span class="source-chip">Twitch</span>
+      <span class="source-chip">Vimeo</span>
+      <span class="source-chip">Direct URLs</span>
+      <span class="source-chip">File Upload</span>
+    </div>
+  </div>
+</section>
+
+<!-- API EXAMPLE -->
+<section class="section" id="api" style="padding-top: 0;">
+  <div class="section-label">Developer First</div>
+  <h2 class="section-title">Simple REST API</h2>
+  <p class="section-sub">Submit a URL, get back a detection report. That's it.</p>
+
+  <div class="code-section">
+    <div class="code-header">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><code><span class="tok-kw">import</span> requests
+
+<span class="tok-cmt"># Submit a detection job</span>
+response = requests.<span class="tok-fn">post</span>(
+    <span class="tok-str">"https://api.aiblock.dev/v1/detect"</span>,
+    headers={<span class="tok-str">"Authorization"</span>: <span class="tok-str">"Bearer YOUR_API_KEY"</span>},
+    json={
+        <span class="tok-str">"url"</span>: <span class="tok-str">"https://www.youtube.com/watch?v=dQw4w9WgXcQ"</span>,
+        <span class="tok-str">"types"</span>: [<span class="tok-str">"audio"</span>, <span class="tok-str">"video"</span>]
+    }
+)
+
+job = response.<span class="tok-fn">json</span>()
+<span class="tok-cmt"># {"job_id": "det_abc123", "status": "queued"}</span>
+
+<span class="tok-cmt"># Fetch results</span>
+result = requests.<span class="tok-fn">get</span>(
+    <span class="tok-fn">f</span><span class="tok-str">"https://api.aiblock.dev/v1/jobs/{job[</span><span class="tok-str">'job_id'</span><span class="tok-str">]}"</span>,
+    headers={<span class="tok-str">"Authorization"</span>: <span class="tok-str">"Bearer YOUR_API_KEY"</span>}
+).<span class="tok-fn">json</span>()
+
+<span class="tok-fn">print</span>(result[<span class="tok-str">"detection"</span>])
+<span class="tok-cmt"># {"audio": {"ai_probability": 0.94, "model": "ElevenLabs", ...},</span>
+<span class="tok-cmt">#  "video": {"deepfake_score": 0.12, "confidence": 0.97}}</span></code></pre>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-title">Start free. Scale as you grow.</h2>
+  <p class="section-sub">No hidden fees. Cancel anytime. Powered by Stripe.</p>
+
+  <div class="pricing-grid">
+    <!-- FREE -->
+    <div class="pricing-card">
+      <p class="plan-name">Hobby</p>
+      <div class="plan-price"><sup>$</sup>0<sub>/mo</sub></div>
+      <p class="plan-desc">Perfect for experimenting and small projects.</p>
+      <ul class="plan-features">
+        <li>100 detections / month</li>
+        <li>Audio &amp; text detection</li>
+        <li>REST API access</li>
+        <li>Community support</li>
+      </ul>
+      <a href="#" class="plan-btn plan-btn-outline">Get started free</a>
+    </div>
+
+    <!-- PRO -->
+    <div class="pricing-card featured">
+      <span class="popular-badge">Most Popular</span>
+      <p class="plan-name">Pro</p>
+      <div class="plan-price"><sup>$</sup>49<sub>/mo</sub></div>
+      <p class="plan-desc">For developers and growing applications.</p>
+      <ul class="plan-features">
+        <li>10,000 detections / month</li>
+        <li>All 4 content types</li>
+        <li>Webhook notifications</li>
+        <li>MCP server access</li>
+        <li>Priority processing</li>
+        <li>Email support</li>
+      </ul>
+      <a href="#" class="plan-btn plan-btn-solid">Start Pro trial</a>
+    </div>
+
+    <!-- ENTERPRISE -->
+    <div class="pricing-card">
+      <p class="plan-name">Enterprise</p>
+      <div class="plan-price" style="font-size:2rem;">Custom</div>
+      <p class="plan-desc">For high-volume platforms and organisations.</p>
+      <ul class="plan-features">
+        <li>Unlimited detections</li>
+        <li>On-premise deployment</li>
+        <li>SLA guarantee</li>
+        <li>Dedicated support</li>
+        <li>Custom model fine-tuning</li>
+      </ul>
+      <a href="mailto:hello@aiblock.dev" class="plan-btn plan-btn-outline">Contact us</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Ready to detect AI content?</h2>
+  <p>Join developers using AIBlock to add trust and transparency to their platforms.</p>
+  <div class="hero-actions">
+    <a href="#pricing" class="btn btn-primary">Get your free API key &rarr;</a>
+    <a href="https://github.com/utkarsh2k2/AIBlock" target="_blank" class="btn btn-secondary">View on GitHub</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">AI<span style="color:var(--accent-light)">Block</span></div>
+  <span>&copy; 2026 AIBlock. All rights reserved.</span>
+  <span>
+    <a href="https://github.com/utkarsh2k2/AIBlock" target="_blank">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="mailto:hello@aiblock.dev">Contact</a>
+  </span>
+</footer>
+
+</body>
+</html>
