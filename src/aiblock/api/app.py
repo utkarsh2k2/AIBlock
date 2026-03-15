@@ -68,11 +68,13 @@ def create_app() -> FastAPI:
     from aiblock.api.routes.detect import router as detect_router
     from aiblock.api.routes.keys import router as keys_router
     from aiblock.api.routes.webhooks import router as webhooks_router
+    from aiblock.api.deezer_preview import router as deezer_preview_router
 
     app.include_router(health_router)
     app.include_router(detect_router)
     app.include_router(keys_router)
     app.include_router(webhooks_router)
+    app.include_router(deezer_preview_router)
 
     # ── Exception handlers ─────────────────────────────────────────────────
     @app.exception_handler(Exception)
