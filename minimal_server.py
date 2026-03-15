@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from aiblock.api.deezer_preview import router
+from src.aiblock.api.deezer_preview import router
 
 _static_dir = pathlib.Path(__file__).parent / "src/aiblock/static"
 
