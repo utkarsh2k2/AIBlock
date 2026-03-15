@@ -9,9 +9,12 @@ Usage:
 import logging
 from contextlib import asynccontextmanager
 
+import pathlib
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from aiblock.settings import get_settings
 
@@ -75,6 +78,14 @@ def create_app() -> FastAPI:
     app.include_router(keys_router)
     app.include_router(webhooks_router)
     app.include_router(deezer_preview_router)
+
+    # ── Static files & game route ──────────────────────────────────────────
+    _static_dir = pathlib.Path(__file__).parent / "static"
+    app.mount("/static", StaticFiles(directory=_static_dir), name="static")
+
+    @app.get("/game", include_in_schema=False)
+    async def game():
+        return FileResponse(_static_dir / "fake-or-real.html")
 
     # ── Exception handlers ─────────────────────────────────────────────────
     @app.exception_handler(Exception)
