@@ -24,7 +24,7 @@ app.mount("/static", StaticFiles(directory=_static_dir), name="static")
 
 @app.get("/home")
 async def read_root():
-    return FileResponse("ai-or-not.html")
+    return FileResponse(_static_dir / "ai-or-not.html")
 @app.get("/game", include_in_schema=False)
 async def game():
     return FileResponse(_static_dir / "fake-or-real.html")
