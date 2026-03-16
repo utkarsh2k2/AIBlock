@@ -35,7 +35,7 @@ async def health():
 
 @app.get("/home", include_in_schema=False)
 async def home():
-    return FileResponse(_static_dir / "fake-or-real.html")
+    return FileResponse(_static_dir / "ai-or-not.html")
 
 @app.get("/game", include_in_schema=False)
 async def game():
