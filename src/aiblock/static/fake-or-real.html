@@ -55,21 +55,10 @@
     #track-meta h2 { font-size: 1.1rem; font-weight: 700; }
     #track-meta p  { font-size: 0.875rem; color: #94a3b8; margin-top: 0.25rem; }
 
-    #btn-play {
+    audio {
       width: 100%;
-      background: #4f46e520;
-      border-color: #4f46e5;
-      color: #818cf8;
-      padding: 0.75rem;
-    }
-    #btn-play:hover { background: #4f46e540; }
-    #btn-play:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    #listen-lock {
-      text-align: center;
-      color: #94a3b8;
-      font-size: 0.875rem;
-      padding: 0.25rem 0;
+      border-radius: 0.5rem;
+      accent-color: #818cf8;
     }
 
     #choices {
@@ -158,15 +147,11 @@
     </div>
   </div>
 
-  <div id="player-area" style="display:none">
-    <audio id="player"></audio>
-    <button id="btn-play" onclick="tapPlay()">▶ Play Preview</button>
-    <div id="listen-lock">🎧 Listen for <span id="listen-count">5</span>s to unlock</div>
-  </div>
+  <audio id="player" controls style="display:none"></audio>
 
   <div id="choices" style="display:none">
-    <button id="btn-real" onclick="guess('real')" disabled>Real Artist</button>
-    <button id="btn-fake" onclick="guess('fake')" disabled>AI Fake</button>
+    <button id="btn-real" onclick="guess('real')">Real Artist</button>
+    <button id="btn-fake" onclick="guess('fake')">AI Fake</button>
     <button id="btn-next" onclick="nextTrack()" disabled>Next Track →</button>
   </div>
 
@@ -202,48 +187,6 @@
   let answered = false;
 
   const API_BASE = '';
-
-  // Listen-lock state
-  const LISTEN_REQUIRED = 5;
-  let listenTimer = null;
-  let listenElapsed = 0;
-
-  function tapPlay() {
-    const player = document.getElementById('player');
-    player.play().catch(() => {}); // best-effort; timer counts regardless
-    startListenTimer();
-  }
-
-  function startListenTimer() {
-    if (listenTimer) return; // already counting
-    document.getElementById('btn-play').disabled = true;
-    document.getElementById('btn-play').textContent = '⏸ Playing…';
-    listenTimer = setInterval(() => {
-      listenElapsed++;
-      const remaining = LISTEN_REQUIRED - listenElapsed;
-      if (remaining > 0) {
-        document.getElementById('listen-count').textContent = remaining;
-      } else {
-        clearInterval(listenTimer);
-        listenTimer = null;
-        document.getElementById('listen-lock').textContent = '✓ Unlocked — make your guess!';
-        document.getElementById('btn-real').disabled = false;
-        document.getElementById('btn-fake').disabled = false;
-      }
-    }, 1000);
-  }
-
-  function resetListenLock() {
-    if (listenTimer) { clearInterval(listenTimer); listenTimer = null; }
-    listenElapsed = 0;
-    document.getElementById('listen-count').textContent = LISTEN_REQUIRED;
-    document.getElementById('listen-lock').textContent =
-      `🎧 Listen for ${LISTEN_REQUIRED}s to unlock`;
-    document.getElementById('btn-play').disabled = false;
-    document.getElementById('btn-play').textContent = '▶ Play Preview';
-    document.getElementById('btn-real').disabled = true;
-    document.getElementById('btn-fake').disabled = true;
-  }
 
   async function loadTracks() {
     const allQueries = [...REAL_QUERIES, ...FAKE_QUERIES].join(",");
@@ -296,14 +239,15 @@
     document.getElementById("player").src = t.preview_url;
     document.getElementById("player").load();
 
-    resetListenLock();
+    document.getElementById("track-info").style.display = "flex";
+    document.getElementById("player").style.display     = "block";
+    document.getElementById("choices").style.display    = "grid";
+    document.getElementById("feedback").textContent     = "";
+    document.getElementById("track-num").textContent    = index + 1;
+    document.getElementById("btn-next").disabled        = true;
 
-    document.getElementById("track-info").style.display  = "flex";
-    document.getElementById("player-area").style.display = "block";
-    document.getElementById("choices").style.display     = "grid";
-    document.getElementById("feedback").textContent      = "";
-    document.getElementById("track-num").textContent     = index + 1;
-    document.getElementById("btn-next").disabled         = true;
+    document.getElementById("btn-real").disabled = false;
+    document.getElementById("btn-fake").disabled = false;
   }
 
   function guess(choice) {
@@ -335,10 +279,9 @@
   }
 
   function endGame() {
-    if (listenTimer) { clearInterval(listenTimer); listenTimer = null; }
-    document.getElementById("track-info").style.display  = "none";
-    document.getElementById("player-area").style.display = "none";
-    document.getElementById("choices").style.display     = "none";
+    document.getElementById("track-info").style.display = "none";
+    document.getElementById("player").style.display     = "none";
+    document.getElementById("choices").style.display    = "none";
     document.getElementById("feedback").textContent =
       `Game over! Final score: ${score} / ${tracks.length}`;
     document.getElementById("feedback").className = score >= tracks.length / 2 ? "correct" : "incorrect";
@@ -350,12 +293,6 @@
     el.textContent = msg;
     el.style.display = "block";
   }
-
-  // Verify Deezer preview API is reachable and returning real URLs
-  fetch(`${API_BASE}/v1/audio/preview?q=AC%2FDC+Back+in+Black`)
-    .then(r => r.json())
-    .then(d => console.log('[AIBlock] preview test AC/DC:', d.preview_url, d.mocked ? '(mocked)' : '(live)'))
-    .catch(e => console.warn('[AIBlock] preview test failed:', e.message));
 
   loadTracks();
 </script>
