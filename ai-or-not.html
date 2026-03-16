@@ -326,7 +326,7 @@ async function fetchPreviews(){
   }
 }
 
-let currentIndex=0,streak=0,results=[],activeCard=null,audioPlayers={};
+let currentIndex=0,streak=0,results=[],activeCard=null,audioPlayers={},listenWallTimers={};
 
 function createCards(){
   const area=document.getElementById('cardArea');
@@ -382,8 +382,6 @@ function createCards(){
         const pct=(audio.currentTime/audio.duration)*100;
         document.getElementById('fill-'+idx).style.width=pct+'%';
         document.getElementById('elapsed-'+idx).textContent=fmtTime(Math.floor(audio.currentTime));
-        listenTime[idx]=audio.currentTime;
-        updateListenLock(idx);
       });
       audio.addEventListener('ended',()=>{
         document.getElementById('pb-'+idx).innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
@@ -415,10 +413,19 @@ function togglePlay(idx){
     audio.play().catch(()=>{});
     btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     ac.classList.add('playing');
+    // Wall-clock listen timer — counts regardless of whether audio actually plays
+    if(!listenWallTimers[idx]){
+      listenWallTimers[idx]=setInterval(()=>{
+        listenTime[idx]=(listenTime[idx]||0)+0.2;
+        updateListenLock(idx);
+        if(listenTime[idx]>=5){clearInterval(listenWallTimers[idx]);delete listenWallTimers[idx];}
+      },200);
+    }
   } else {
     audio.pause();
     btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
     ac.classList.remove('playing');
+    clearInterval(listenWallTimers[idx]);delete listenWallTimers[idx];
   }
 }
 
@@ -493,6 +500,7 @@ function stopAll(){
   Object.values(audioPlayers).forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}});
   audioPlayers={};
   Object.keys(simTimers).forEach(k=>clearInterval(simTimers[k]));simState={};simTimers={};
+  Object.keys(listenWallTimers).forEach(k=>clearInterval(listenWallTimers[k]));listenWallTimers={};
   listenTime={};
 }
 
