@@ -1,5 +1,6 @@
 [build]
 builder = "dockerfile"
 
+# No startCommand: use Dockerfile CMD so the container shell expands $PORT
+# (Railway injects PORT; CMD runs via sh -c).
 [deploy]
-startCommand = "uvicorn minimal_server:app --host 0.0.0.0 --port ${PORT:-8000}"
