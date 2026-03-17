@@ -299,15 +299,59 @@
     API_BASE = window.location.protocol + "//" + window.location.hostname + ":8000";
     console.log("[EarCheck] page not on 8000, using API_BASE:", API_BASE);
   }
-  var LISTEN_SEC = 5;
+  // Shorter listen lock so rounds feel snappier
+  var LISTEN_SEC = 3;
 
+  // Each track includes a short teaching cue so feedback can explain why it's AI or human.
   const TRACKS = [
-    { deezerQuery: "AC/DC Back in Black", track: "Back in Black", artist: "AC/DC", isAI: false },
-    { deezerQuery: "Metallica Enter Sandman", track: "Enter Sandman", artist: "Metallica", isAI: true },
-    { deezerQuery: "Led Zeppelin Stairway to Heaven", track: "Stairway to Heaven", artist: "Led Zeppelin", isAI: false },
-    { deezerQuery: "Nirvana Smells Like Teen Spirit", track: "Smells Like Teen Spirit", artist: "Nirvana", isAI: false },
-    { deezerQuery: "AC/DC Highway to Hell", track: "Highway to Hell", artist: "AC/DC", isAI: true },
-    { deezerQuery: "Queen Bohemian Rhapsody", track: "Bohemian Rhapsody", artist: "Queen", isAI: true },
+    {
+      deezerQuery: "AC/DC Back in Black",
+      track: "Back in Black",
+      artist: "AC/DC",
+      isAI: false,
+      reason: "This is a real studio master — listen for room noise and tiny timing drift in the drums.",
+      tip: "Human performances usually have micro-imperfections instead of metronome-perfect hits."
+    },
+    {
+      deezerQuery: "Metallica Enter Sandman",
+      track: "Enter Sandman",
+      artist: "Metallica",
+      isAI: true,
+      reason: "The vocal and guitars are locked in almost mechanically with no breath noise between phrases.",
+      tip: "AI often sounds over-quantized and too clean, especially on sustained notes."
+    },
+    {
+      deezerQuery: "Led Zeppelin Stairway to Heaven",
+      track: "Stairway to Heaven",
+      artist: "Led Zeppelin",
+      isAI: false,
+      reason: "You can hear pick noise and natural dynamics building across the performance.",
+      tip: "Humans push and pull tempo slightly as a song swells."
+    },
+    {
+      deezerQuery: "Nirvana Smells Like Teen Spirit",
+      track: "Smells Like Teen Spirit",
+      artist: "Nirvana",
+      isAI: false,
+      reason: "The vocal rasp and uneven scream intensity are classic Cobain, not a smooth clone.",
+      tip: "AI vocals often keep the same tone and intensity on every line."
+    },
+    {
+      deezerQuery: "AC/DC Highway to Hell",
+      track: "Highway to Hell",
+      artist: "AC/DC",
+      isAI: true,
+      reason: "The voice nails the timbre but the phrasing is too even and never fully strains.",
+      tip: "Cloned voices can mimic tone but struggle with natural strain and fatigue."
+    },
+    {
+      deezerQuery: "Queen Bohemian Rhapsody",
+      track: "Bohemian Rhapsody",
+      artist: "Queen",
+      isAI: true,
+      reason: "The stacked harmonies are perfectly balanced with no slight wobbles between parts.",
+      tip: "AI choirs tend to sound like one voice copied many times instead of a messy group."
+    }
   ];
 
   let tracks = TRACKS.map(t => ({ ...t, audioUrl: "" }));
@@ -392,15 +436,27 @@
     const locked = !canGuess();
     btnHuman.disabled = locked;
     btnAI.disabled = locked;
-    streakText.textContent = "Streak " + streak;
-    scoreText.textContent = "Score " + score + " / " + answered;
+    streakText.textContent = streak > 1 ? ("Streak " + streak) : "Warming up";
+    if (answered > 0) {
+      var acc = Math.round((score / answered) * 100);
+      scoreText.textContent = "Accuracy " + acc + "% · " + score + " / " + answered;
+    } else {
+      scoreText.textContent = "Accuracy —";
+    }
     streakDot.style.visibility = streak > 0 ? "visible" : "hidden";
   }
 
-  function showFeedback(correct, actualAI) {
+  function showFeedback(t, correct) {
+    var actualAI = !!t.isAI;
     feedback.className = "feedback visible " + (correct ? "correct" : "wrong");
-    feedbackText.textContent = correct ? "Correct." : "Wrong.";
-    feedbackSub.textContent = actualAI ? "This one was AI-generated." : "This one was human.";
+    feedbackText.textContent = correct
+      ? (actualAI ? "Nice catch — that was AI." : "You spotted the real one.")
+      : (actualAI ? "Tricky — that was actually AI." : "Surprise — that one was human.");
+    var mainLine = actualAI ? "AI: " : "Human: ";
+    if (t.reason) mainLine += t.reason;
+    else mainLine += actualAI ? "Listen for over-polished, robotic timing." : "Listen for little imperfections and room noise.";
+    var tipLine = t.tip ? (" Tip: " + t.tip) : "";
+    feedbackSub.textContent = mainLine + tipLine;
   }
 
   function setTrack() {
@@ -490,7 +546,7 @@
     } else {
       streak = 0;
     }
-    showFeedback(correct, t.isAI);
+    showFeedback(t, correct);
     updateUI();
     btnHuman.disabled = true;
     btnAI.disabled = true;
