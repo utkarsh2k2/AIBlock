@@ -38,9 +38,9 @@
     }
     header {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
       padding-top: 6px;
       z-index: 1;
     }
@@ -53,6 +53,25 @@
     .tagline {
       font-size: 11px;
       color: #6b7280;
+    }
+    .header-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .header-link {
+      font-size: 10px;
+      color: #9ca3af;
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.35);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+    .header-link:hover {
+      border-color: rgba(148,163,184,.6);
+      color: #e5e7eb;
     }
     main {
       flex: 1;
@@ -265,8 +284,11 @@
 <body>
   <div class="phone">
     <header>
-      <div class="brand">EAR CHECK</div>
-      <div class="tagline">Spot the AI · One clip at a time</div>
+      <div class="header-main">
+        <div class="brand">EAR CHECK</div>
+        <div class="tagline">Spot the AI · One clip at a time</div>
+      </div>
+      <a href="/ear-check" target="_blank" rel="noopener noreferrer" class="header-link">About this demo</a>
     </header>
     <main>
       <section class="center" aria-label="Current clip">

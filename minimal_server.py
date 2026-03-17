@@ -141,6 +141,11 @@ async def mark3():
     return _static_file("mark3.html")
 
 
+@app.get("/ear-check", include_in_schema=False)
+async def ear_check_guide():
+    return _static_file("ear-check.html")
+
+
 if __name__ == "__main__":
     import os
     import uvicorn
