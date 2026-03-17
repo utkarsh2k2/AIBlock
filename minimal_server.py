@@ -1,6 +1,8 @@
 """Minimal server for testing without DB/Redis."""
+import logging
 import os
 import pathlib
+import sys
 from urllib.parse import urlparse
 
 import httpx
@@ -9,19 +11,42 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+# Log to stderr so Railway captures it in Deploy Logs
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    stream=sys.stderr,
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+log = logging.getLogger("aiblock")
+
 from src.aiblock.api.deezer_preview import router
 
 _static_dir = (pathlib.Path(__file__).resolve().parent / "src" / "aiblock" / "static").resolve()
+
+# Startup: log static dir and key files (visible in Railway Deploy Logs)
+log.info("static_dir=%s exists=%s", _static_dir, _static_dir.is_dir())
+for name in ("mark3.html", "ai-or-not.html", "fake-or-real.html"):
+    p = _static_dir / name
+    log.info("  %s: exists=%s", name, p.is_file())
 
 
 def _static_file(name: str):
     """Return FileResponse for a file under _static_dir, or 404 if missing."""
     path = _static_dir / name
     if not path.is_file():
+        log.warning("static file missing: %s (dir=%s)", name, _static_dir)
         raise HTTPException(status_code=404, detail=f"Static file not found: {name}")
     return FileResponse(path)
 
 app = FastAPI(title="AIBlock - Deezer Preview")
+
+
+@app.on_event("startup")
+def _on_startup():
+    port = int(os.environ.get("PORT", "8000"))
+    log.info("AIBlock server starting on 0.0.0.0:%s", port)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,6 +54,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def _log_requests(request, call_next):
+    """Log every request and response for debugging in Railway HTTP/Deploy logs."""
+    method = request.method
+    path = request.url.path
+    try:
+        response = await call_next(request)
+        log.info("%s %s -> %s", method, path, response.status_code)
+        return response
+    except Exception as e:
+        log.exception("%s %s -> error: %s", method, path, e)
+        raise
 
 app.include_router(router)
 app.mount("/static", StaticFiles(directory=_static_dir), name="static")
