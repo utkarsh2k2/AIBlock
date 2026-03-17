@@ -4,14 +4,22 @@ import pathlib
 from urllib.parse import urlparse
 
 import httpx
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.aiblock.api.deezer_preview import router
 
-_static_dir = pathlib.Path(__file__).parent / "src/aiblock/static"
+_static_dir = (pathlib.Path(__file__).resolve().parent / "src" / "aiblock" / "static").resolve()
+
+
+def _static_file(name: str):
+    """Return FileResponse for a file under _static_dir, or 404 if missing."""
+    path = _static_dir / name
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail=f"Static file not found: {name}")
+    return FileResponse(path)
 
 app = FastAPI(title="AIBlock - Deezer Preview")
 
@@ -79,19 +87,19 @@ async def audio_proxy(url: str = Query(..., description="Audio URL to stream")):
 
 @app.get("/home", include_in_schema=False)
 async def home():
-    return FileResponse(_static_dir / "ai-or-not.html")
+    return _static_file("ai-or-not.html")
 
 @app.get("/game", include_in_schema=False)
 async def game():
-    return FileResponse(_static_dir / "fake-or-real.html")
+    return _static_file("fake-or-real.html")
 
 @app.get("/mark2", include_in_schema=False)
 async def mark2():
-    return FileResponse(_static_dir / "mark2.html")
+    return _static_file("mark2.html")
 
 @app.get("/mark3", include_in_schema=False)
 async def mark3():
-    return FileResponse(_static_dir / "mark3.html")
+    return _static_file("mark3.html")
 
 
 if __name__ == "__main__":
