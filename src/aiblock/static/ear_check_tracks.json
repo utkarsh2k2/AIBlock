@@ -24,7 +24,7 @@
   },
   {
     "id": "enter_sandman_ai",
-    "display_label": "Rock · easy",
+    "display_label": "",
     "title": "Rocky (AI-native)",
     "artist": "SunoCC (Suno AI)",
     "audio_url": "https://storage.sunocc.com/audio/c7221e360b126e73e47ab61686d0a410/MDdmOTZkZTYtYWUwMC00MzBhLThkZTktNTgwMjJjNTY0YjYz.mp3",
@@ -68,7 +68,7 @@
   },
   {
     "id": "highway_to_hell_ai",
-    "display_label": "Rock · medium",
+    "display_label": "",
     "title": "rock stare (AI-native)",
     "artist": "SunoCC (Suno AI)",
     "audio_url": "https://storage.sunocc.com/audio/97239cc99b9fb354149be2696a045c0c/32c22cdc-a698-4e91-91b5-b93cf5ec6290.mp3",
