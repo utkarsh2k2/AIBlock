@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Ear Check · Demo Guide</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 920px;
+      background: radial-gradient(circle at top, #020617 0, #020617 55%, #000 100%);
+      border-radius: 32px;
+      padding: 24px 28px 28px;
+      box-shadow:
+        0 24px 80px rgba(0,0,0,.85),
+        0 0 0 1px rgba(15,23,42,.9);
+    }
+    .header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .brand {
+      font-size: 13px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      margin-top: 4px;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .pill {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.4);
+      color: #9ca3af;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 24px;
+    }
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #e5e7eb;
+      margin-bottom: 8px;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 4px 0 8px;
+    }
+    li {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #e5e7eb;
+      margin-bottom: 4px;
+    }
+    li::before {
+      content: "•";
+      display: inline-block;
+      margin-right: 6px;
+      color: #6ee7b7;
+      transform: translateY(-1px);
+    }
+    .muted {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.4);
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      background: rgba(15,23,42,.9);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    a {
+      color: #a5b4fc;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+      .shell { padding: 20px 18px 22px; border-radius: 24px; }
+      .grid { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="header">
+      <div>
+        <div class="brand">EAR CHECK</div>
+        <div class="title">How this demo works</div>
+        <div class="subtitle">A quick guide to the Ear Check game and the AIBlock detection backend.</div>
+      </div>
+      <div class="pill">Demo guide</div>
+    </div>
+
+    <div class="grid">
+      <section>
+        <div class="section-title">Overview</div>
+        <h3>What you’re using</h3>
+        <p>
+          Ear Check is a small, self‑contained demo built on top of the AIBlock audio detection backend.
+          It lets you practice spotting the difference between human recordings and AI‑generated music.
+        </p>
+
+        <div class="section-title">Game flow</div>
+        <h3>How the round works</h3>
+        <ul>
+          <li><strong>Listen</strong>: tap the big button to hear a short clip. You can pause and replay.</li>
+          <li><strong>Guess</strong>: once you’ve listened for a few seconds, choose <strong>Human</strong> or <strong>AI</strong>.</li>
+          <li><strong>Reveal</strong>: see whether you were right, how confident the model is, and one concrete cue to listen for.</li>
+          <li><strong>Next clip</strong>: tap <strong>Next clip</strong> to move on and build a streak.</li>
+        </ul>
+        <p class="muted">
+          The clips are pre‑curated so the experience is fast and repeatable. Ear Check does not accept uploads in this demo.
+        </p>
+
+        <div class="section-title">Interpretation</div>
+        <h3>How to read the verdict</h3>
+        <ul>
+          <li><strong>Label</strong> – whether the clip is treated as human or AI in this game.</li>
+          <li><strong>Model confidence</strong> – how far the backend’s score is from a 50/50 decision.</li>
+          <li><strong>Listening cue</strong> – a specific artefact to replay (timing drift, vocal consistency, noise floor, etc.).</li>
+        </ul>
+        <p class="muted">
+          Confidence is a model output, not ground truth. It is useful for ranking and teaching, not as legal evidence.
+        </p>
+      </section>
+
+      <section>
+        <div class="section-title">Detection logic</div>
+        <h3>What happens behind the button</h3>
+        <span class="badge">Pipeline</span>
+        <ul>
+          <li><strong>Input</strong>: each clip has a public audio source (Deezer preview or AI‑native track) defined in a manifest.</li>
+          <li><strong>Adapt</strong>: AIBlock fetches the audio and normalizes it (mono, fixed sample rate, chunked over time).</li>
+          <li><strong>Detect</strong>: multiple detectors run on each chunk – for example spectral artefacts and prosodic cues.</li>
+          <li><strong>Aggregate</strong>: per‑detector scores are combined into an overall <code>ai_score</code> and <code>confidence</code> using a confidence‑weighted mean.</li>
+        </ul>
+        <p class="muted">
+          Ear Check uses those precomputed scores to drive the verdict line and the difficulty of each clip.
+          The UI never calls the heavy models in real time – that work has already been done by the backend.
+        </p>
+
+        <div class="section-title">What this demo is / isn’t</div>
+        <h3>Scope and limitations</h3>
+        <ul>
+          <li>This is a <strong>teaching and exploration tool</strong>, not a certification service.</li>
+          <li>Short, compressed, or heavily processed audio can be hard for both humans and models.</li>
+          <li>Model behaviour and thresholds may evolve as the underlying research improves.</li>
+        </ul>
+        <p class="muted">
+          For API‑level integration, the same detection pipeline is exposed via AIBlock’s <code>/v1/detect</code> endpoints.
+        </p>
+      </section>
+    </div>
+  </div>
+</body>
+</html>
+
