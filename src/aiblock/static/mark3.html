@@ -486,11 +486,13 @@
     var prefix = correct ? "Correct – " : "Off this time – ";
     feedbackText.textContent = prefix + label + " (" + pct + "% model confidence).";
 
-    var cue = (t.listenFor && t.listenFor.length) ? t.listenFor[0] : (t.tip || "");
-    if (cue) {
-      feedbackSub.textContent = "Replay a moment and listen for: " + cue;
+    // Prefer narrative reveal in a magazine-style voice; keep cues secondary.
+    var story = t.story || "";
+    if (story) {
+      feedbackSub.textContent = story;
     } else {
-      feedbackSub.textContent = "";
+      var cue = (t.listenFor && t.listenFor.length) ? t.listenFor[0] : (t.tip || "");
+      feedbackSub.textContent = cue ? ("Listen for: " + cue) : "";
     }
 
     if (t.sources && t.sources.length) {
@@ -500,8 +502,8 @@
       sourcesList.innerHTML = t.sources.map(function (s, idx) {
         var safeLabel = s.label || ("Source " + (idx + 1));
         var safeUrl = s.url || "#";
-        return '<a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">' + safeLabel + '</a>';
-      }).join(" · ");
+        return '<div style="margin-top:2px;"><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">' + safeLabel + '</a></div>';
+      }).join("");
     } else {
       sourcesToggle.style.display = "none";
       sourcesList.style.display = "none";
@@ -685,6 +687,7 @@
           artist: item.artist,
           isAI: !!item.is_ai_label,
           difficulty: item.difficulty || "medium",
+          story: item.story || "",
           listenFor: item.listen_for || [],
           tip: item.tip || "",
           sources: item.sources || [],

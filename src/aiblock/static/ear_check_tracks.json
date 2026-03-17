@@ -8,11 +8,16 @@
     "platform": "deezer",
     "is_ai_label": false,
     "difficulty": "easy",
+    "story": "Brian Johnson stepped into AC/DC’s hurricane shadow and cut this one at Compass Point Studios in Nassau in spring 1980 with Mutt Lange behind the glass — a tribute that somehow sounds like a victory lap.",
     "listen_for": [
       "The drums are not machine-perfect – tiny rush/drag in the groove.",
       "Faint room noise and cymbal decay between hits."
     ],
-    "sources": [],
+    "sources": [
+      { "label": "Rolling Stone review (Back in Black)", "url": "https://www.rollingstone.com/music/albumreviews/back-in-black-19801127" },
+      { "label": "AllMusic: Back in Black", "url": "https://www.allmusic.com/album/back-in-black-mw0000188862" },
+      { "label": "Discogs: Back in Black (master)", "url": "https://www.discogs.com/master/1440-ACDC-Back-In-Black" }
+    ],
     "tip": "Slight rushing and dragging of the drums instead of a metronome-perfect loop.",
     "ai_score": 0.1,
     "confidence": 0.85
@@ -47,11 +52,16 @@
     "platform": "deezer",
     "is_ai_label": false,
     "difficulty": "medium",
+    "story": "Page and Plant built this slow-burn spell piece by piece in the early ’70s — acoustic hush turning into a full-body roar, the kind of dynamics you can’t fake without leaving fingerprints.",
     "listen_for": [
       "Acoustic guitar pick noise that changes from note to note.",
       "The tempo gently pushes and relaxes as the song builds."
     ],
-    "sources": [],
+    "sources": [
+      { "label": "AllMusic: Stairway to Heaven (song)", "url": "https://www.allmusic.com/song/stairway-to-heaven-mt0000415462" },
+      { "label": "Rolling Stone: Led Zeppelin IV (overview)", "url": "https://www.rollingstone.com/music/music-album-reviews/led-zeppelin-iv-2-185066/" },
+      { "label": "Discogs: Led Zeppelin IV (master)", "url": "https://www.discogs.com/master/11153-Led-Zeppelin-Untitled" }
+    ],
     "tip": "Small changes in pick attack and tempo as the part gets louder.",
     "ai_score": 0.2,
     "confidence": 0.7
@@ -86,11 +96,15 @@
     "platform": "deezer",
     "is_ai_label": true,
     "difficulty": "hard",
+    "story": "This one is a modern AI recreation — it hits the big theatrical shapes, but the edges are too clean, like the chaos got ironed out of the opera.",
     "listen_for": [
       "Choir harmonies that sound like one voice copied many times.",
       "Very little wobble or timing drift between harmony parts."
     ],
-    "sources": [],
+    "sources": [
+      { "label": "SunoCC (AI music platform)", "url": "https://sunocc.com/" },
+      { "label": "AI music context: Udio", "url": "https://www.udio.com/" }
+    ],
     "tip": "Stacked parts that feel like carbon copies instead of a messy group of singers.",
     "ai_score": 0.86,
     "confidence": 0.65
@@ -104,11 +118,16 @@
     "platform": "deezer",
     "is_ai_label": false,
     "difficulty": "hard",
+    "story": "Cobain’s voice doesn’t glide — it scrapes. This is a human performance where the rasp, pitch, and intensity shift line to line like he’s wrestling the song into place.",
     "listen_for": [
       "Screamed lines that change rasp and loudness from phrase to phrase.",
       "Guitars and drums that get slightly wilder instead of looping perfectly."
     ],
-    "sources": [],
+    "sources": [
+      { "label": "AllMusic: Smells Like Teen Spirit (song)", "url": "https://www.allmusic.com/song/smells-like-teen-spirit-mt0002069535" },
+      { "label": "Rolling Stone: Nevermind (album review/overview)", "url": "https://www.rollingstone.com/music/music-album-reviews/nevermind-187205/" },
+      { "label": "Discogs: Nevermind (master)", "url": "https://www.discogs.com/master/4145-Nirvana-Nevermind" }
+    ],
     "tip": "Uneven rasp and intensity that a clone would usually smooth out.",
     "ai_score": 0.3,
     "confidence": 0.55
