@@ -227,7 +227,7 @@
     }
     .feedback {
       font-size: 12px;
-      text-align: center;
+      text-align: left;
       padding: 8px 12px;
       border-radius: 10px;
       margin-top: 4px;
@@ -237,7 +237,29 @@
     .feedback.visible { display: block; }
     .feedback.correct { background: rgba(34,197,94,.12); color: #86efac; }
     .feedback.wrong { background: rgba(239,68,68,.12); color: #fca5a5; }
-    .feedback-sub { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    .feedback-sub { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+    .feedback-sources-toggle {
+      margin-top: 6px;
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      cursor: pointer;
+    }
+    .feedback-sources {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    .feedback-sources a {
+      color: #a5b4fc;
+      text-decoration: none;
+    }
+    .feedback-sources a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -279,6 +301,10 @@
         <div class="feedback" id="feedback" role="status">
           <div id="feedbackText"></div>
           <div class="feedback-sub" id="feedbackSub"></div>
+          <button type="button" class="feedback-sources-toggle" id="sourcesToggle" style="display:none;">
+            Sources ▾
+          </button>
+          <div class="feedback-sources" id="sourcesList" style="display:none;"></div>
         </div>
         <button class="choice primary" type="button" id="nextBtn" style="margin-top:8px; display:none;">
           <span></span><span>Next clip</span>
@@ -337,6 +363,8 @@
   const feedback = document.getElementById("feedback");
   const feedbackText = document.getElementById("feedbackText");
   const feedbackSub = document.getElementById("feedbackSub");
+  const sourcesToggle = document.getElementById("sourcesToggle");
+  const sourcesList = document.getElementById("sourcesList");
   const streakDot = document.getElementById("streakDot");
   const streakText = document.getElementById("streakText");
   const scoreText = document.getElementById("scoreText");
@@ -415,25 +443,31 @@
 
     var conf = typeof t.confidence === "number" ? t.confidence : 1.0;
     var pct = Math.round(conf * 100);
-    var band;
-    if (conf >= 0.85) band = "Very likely";
-    else if (conf >= 0.6) band = "Leaning";
-    else band = "Uncertain";
+    var label = actualAI ? "AI" : "human";
+    var prefix = correct ? "Correct – " : "Off this time – ";
+    feedbackText.textContent = prefix + label + " (" + pct + "% model confidence).";
 
-    var baseLabel = actualAI ? "AI" : "human";
-    if (conf < 0.6) {
-      feedbackText.textContent = (correct ? "Correct. " : "Tough one. ") +
-        band + " " + baseLabel + " (" + pct + "% model confidence).";
+    var cue = (t.listenFor && t.listenFor.length) ? t.listenFor[0] : (t.tip || "");
+    if (cue) {
+      feedbackSub.textContent = "Replay a moment and listen for: " + cue;
     } else {
-      feedbackText.textContent = (correct ? "Correct. " : "Off this time. ") +
-        band + " " + baseLabel + " (" + pct + "% model confidence).";
+      feedbackSub.textContent = "";
     }
 
-    var mainLine = actualAI ? "AI: " : "Human: ";
-    if (t.reason) mainLine += t.reason;
-    else mainLine += actualAI ? "Listen for over-polished, robotic timing." : "Listen for little imperfections and room noise.";
-    var tipLine = t.tip ? (" Tip: " + t.tip) : "";
-    feedbackSub.textContent = mainLine + tipLine;
+    if (t.sources && t.sources.length) {
+      sourcesToggle.style.display = "inline-block";
+      sourcesList.style.display = "none";
+      sourcesToggle.textContent = "Sources ▾";
+      sourcesList.innerHTML = t.sources.map(function (s, idx) {
+        var safeLabel = s.label || ("Source " + (idx + 1));
+        var safeUrl = s.url || "#";
+        return '<a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">' + safeLabel + '</a>';
+      }).join(" · ");
+    } else {
+      sourcesToggle.style.display = "none";
+      sourcesList.style.display = "none";
+      sourcesList.innerHTML = "";
+    }
   }
 
   function setTrack() {
@@ -443,7 +477,7 @@
     answeredThis = false;
     listenTime = 0;
     progressFill.style.width = "0%";
-    timeDisplay.textContent = "0:00 / 0:30";
+    timeDisplay.textContent = "0:00 / --:--";
     playBtn.classList.remove("playing");
     playIcon.textContent = "›";
     playLabel.textContent = "Tap to listen";
@@ -495,7 +529,12 @@
   }
 
   audio.addEventListener("timeupdate", function () {
-    if (!audio.duration) return;
+    if (!audio.duration || !isFinite(audio.duration)) {
+      timeDisplay.textContent = fmtTime(audio.currentTime) + " / --:--";
+      listenTime = audio.currentTime;
+      updateUI();
+      return;
+    }
     const pct = (audio.currentTime / audio.duration) * 100;
     progressFill.style.width = pct + "%";
     timeDisplay.textContent = fmtTime(audio.currentTime) + " / " + fmtTime(audio.duration);
@@ -538,6 +577,14 @@
     console.error("[EarCheck] .phone not found");
   } else {
     console.log("[EarCheck] Attaching click/touchend to .phone");
+    if (sourcesToggle) {
+      sourcesToggle.addEventListener("click", function () {
+        if (!sourcesList.innerHTML) return;
+        var isOpen = sourcesList.style.display === "block";
+        sourcesList.style.display = isOpen ? "none" : "block";
+        sourcesToggle.textContent = isOpen ? "Sources ▾" : "Sources ▴";
+      });
+    }
     phoneEl.addEventListener("click", function (e) {
       var t = e.target;
       console.log("[EarCheck] click", t.id || t.className || t.tagName, "target:", t);
@@ -569,8 +616,9 @@
           artist: item.artist,
           isAI: !!item.is_ai_label,
           difficulty: item.difficulty || "medium",
-          reason: item.reason || "",
+          listenFor: item.listen_for || [],
           tip: item.tip || "",
+          sources: item.sources || [],
           confidence: typeof item.confidence === "number" ? item.confidence : 1.0,
           audioUrl: ""  // filled by fetchPreviews
         };
