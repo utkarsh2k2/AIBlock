@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>AI or Not – Mark II</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+      color: #e5e7eb;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .shell {
+      width: 380px;
+      max-width: 100%;
+      border-radius: 32px;
+      padding: 18px 12px 22px;
+      background: radial-gradient(circle at top left, rgba(249,115,22,.16), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(56,189,248,.2), transparent 65%),
+                  rgba(15,23,42,.94);
+      box-shadow:
+        0 24px 80px rgba(0,0,0,.75),
+        0 0 0 1px rgba(148,163,184,.15);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .pill {
+      position: absolute;
+      inset: 16px 90px auto;
+      height: 20px;
+      border-radius: 999px;
+      background: rgba(15,23,42,.9);
+      box-shadow: 0 0 0 1px rgba(15,23,42,1);
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px 4px;
+      z-index: 1;
+    }
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(15,23,42,.9);
+      border: 1px solid rgba(148,163,184,.45);
+    }
+    .badge span:nth-child(1) { font-size: 12px; }
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 0 10px;
+      font-size: 11px;
+    }
+    .tab {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.3);
+      color: #9ca3af;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, #f97316, #fb7185);
+      border-color: transparent;
+      color: #0b1120;
+      font-weight: 600;
+    }
+    .card {
+      margin: 4px 10px 0;
+      border-radius: 20px;
+      background: radial-gradient(circle at top left, rgba(248,250,252,.06), rgba(15,23,42,1));
+      border: 1px solid rgba(148,163,184,.35);
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at -10% 0, rgba(248,250,252,.12), transparent 60%);
+      opacity: .7;
+      pointer-events: none;
+    }
+    .row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .track-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .track-meta {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .streak {
+      font-size: 11px;
+      color: #f97316;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .streak-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #f97316;
+      box-shadow: 0 0 8px rgba(248,113,22,.8);
+    }
+    .wave {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bars {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 26px;
+    }
+    .bar {
+      width: 2px;
+      border-radius: 999px;
+      background: rgba(148,163,184,.6);
+      animation: pulse 0.6s ease-in-out infinite alternate;
+      animation-delay: calc(var(--i) * 0.02s);
+    }
+    @keyframes pulse {
+      from { transform: scaleY(.3); opacity: .4; }
+      to { transform: scaleY(1); opacity: 1; }
+    }
+    .time {
+      font-size: 10px;
+      color: #9ca3af;
+      font-variant-numeric: tabular-nums;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.8);
+      background: radial-gradient(circle at top, rgba(248,250,252,.06), rgba(15,23,42,1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .btn-circle span {
+      font-size: 15px;
+    }
+    .btn-circle.primary {
+      flex: 1;
+      justify-content: space-between;
+      padding: 0 12px;
+      background: linear-gradient(135deg, #22c55e, #14b8a6);
+      border-color: transparent;
+      color: #022c22;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .btn-circle.primary span:nth-child(1) { font-size: 13px; }
+    .btn-circle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 30px rgba(15,23,42,.9);
+      border-color: rgba(248,250,252,.5);
+    }
+    .lock {
+      margin-top: 6px;
+      font-size: 10px;
+      color: #9ca3af;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(15,23,42,.9);
+      border: 1px dashed rgba(148,163,184,.5);
+      position: relative;
+      z-index: 1;
+    }
+    .lock span:nth-child(1) { font-size: 11px; }
+    .footer {
+      padding: 0 10px 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .dots {
+      display: flex;
+      gap: 4px;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(148,163,184,.4);
+    }
+    .dot.current {
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34,197,94,.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="pill"></div>
+    <header>
+      <div class="logo">AI / NOT</div>
+      <div class="badge">
+        <span>🎧</span>
+        <span>Ear training · Mark II</span>
+      </div>
+    </header>
+    <div class="tabs">
+      <div class="tab active">Rock mix</div>
+      <div class="tab">Pop</div>
+      <div class="tab">Lo‑fi</div>
+      <div class="tab">Random</div>
+    </div>
+    <section class="card" aria-label="Current track card (static preview)">
+      <div class="row-top">
+        <div>
+          <div class="track-title">Static Sample – Not Interactive</div>
+          <div class="track-meta">Previewing what the real game could look like.</div>
+        </div>
+        <div class="streak">
+          <div class="streak-dot"></div>
+          <span>Streak · 4</span>
+        </div>
+      </div>
+      <div class="wave" aria-hidden="true">
+        <div class="bars">
+          <!-- 26 fake bars -->
+          <div class="bar" style="--i:0; height:30%;"></div>
+          <div class="bar" style="--i:1; height:60%;"></div>
+          <div class="bar" style="--i:2; height:40%;"></div>
+          <div class="bar" style="--i:3; height:75%;"></div>
+          <div class="bar" style="--i:4; height:50%;"></div>
+          <div class="bar" style="--i:5; height:80%;"></div>
+          <div class="bar" style="--i:6; height:45%;"></div>
+          <div class="bar" style="--i:7; height:65%;"></div>
+          <div class="bar" style="--i:8; height:35%;"></div>
+          <div class="bar" style="--i:9; height:70%;"></div>
+          <div class="bar" style="--i:10; height:55%;"></div>
+          <div class="bar" style="--i:11; height:85%;"></div>
+          <div class="bar" style="--i:12; height:45%;"></div>
+          <div class="bar" style="--i:13; height:65%;"></div>
+          <div class="bar" style="--i:14; height:35%;"></div>
+          <div class="bar" style="--i:15; height:70%;"></div>
+          <div class="bar" style="--i:16; height:50%;"></div>
+          <div class="bar" style="--i:17; height:80%;"></div>
+          <div class="bar" style="--i:18; height:40%;"></div>
+          <div class="bar" style="--i:19; height:65%;"></div>
+          <div class="bar" style="--i:20; height:35%;"></div>
+          <div class="bar" style="--i:21; height:60%;"></div>
+          <div class="bar" style="--i:22; height:45%;"></div>
+          <div class="bar" style="--i:23; height:75%;"></div>
+          <div class="bar" style="--i:24; height:50%;"></div>
+          <div class="bar" style="--i:25; height:68%;"></div>
+        </div>
+        <div class="time">0:18 · 0:30</div>
+      </div>
+      <div class="controls">
+        <button class="btn-circle" type="button" aria-label="This is human (static)">
+          <span>🎤</span>
+        </button>
+        <button class="btn-circle" type="button" aria-label="This is AI (static)">
+          <span>🤖</span>
+        </button>
+        <button class="btn-circle primary" type="button" aria-label="Next track (static)">
+          <span>Next track</span>
+          <span>↻</span>
+        </button>
+      </div>
+      <div class="lock">
+        <span>🔒</span>
+        <span>In the real game you’d have to listen for 5 seconds before guessing.</span>
+      </div>
+    </section>
+    <footer class="footer">
+      <div>Static mock · Mark II</div>
+      <div class="dots">
+        <div class="dot current"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
+

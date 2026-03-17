@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Ear Check</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { touch-action: manipulation; }
+    html, body {
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .phone {
+      width: 100%;
+      max-width: 420px;
+      height: 100%;
+      max-height: 840px;
+      border-radius: 32px;
+      padding: 18px 18px 24px;
+      background: radial-gradient(circle at top, #020617 0, #020617 55%, #000 100%);
+      box-shadow:
+        0 24px 80px rgba(0,0,0,.85),
+        0 0 0 1px rgba(15,23,42,.9);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding-top: 6px;
+      z-index: 1;
+    }
+    .brand {
+      font-size: 13px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+    .tagline {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+      gap: 32px;
+    }
+    .center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+    }
+    .status {
+      font-size: 11px;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+    }
+    .big-button-wrap {
+      width: 190px;
+      height: 190px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #020617, #020617 72%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 26px 70px rgba(0,0,0,.9);
+      position: relative;
+      z-index: 2;
+    }
+    .ring {
+      position: absolute;
+      inset: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.35);
+      opacity: .7;
+      pointer-events: none;
+    }
+    .big-button {
+      position: relative;
+      z-index: 1;
+      width: 126px;
+      height: 126px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background:
+        radial-gradient(circle at 30% 0, rgba(56,189,248,.26), rgba(56,189,248,.04) 55%, transparent 72%),
+        radial-gradient(circle at 70% 110%, rgba(34,197,94,.18), #020617 80%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #e5f9ff;
+    }
+    .big-button-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 2px solid rgba(226,232,240,.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+    .big-button-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+    }
+    .track-meta {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .track-meta-strong {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e5e7eb;
+      margin-bottom: 2px;
+    }
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      z-index: 2;
+    }
+    .choice {
+      min-width: 110px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      padding: 9px 14px;
+      font-size: 13px;
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .choice span:first-child {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+    }
+    .choice.primary {
+      border-color: transparent;
+      background: linear-gradient(135deg, #22c55e, #06b6d4);
+      color: #022c22;
+      font-weight: 600;
+    }
+    .bottom {
+      font-size: 11px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .bottom-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+    .bottom-right {
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-wrap {
+      width: 100%;
+      max-width: 260px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 2px;
+      background: #1f2937;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #22c55e, #06b6d4);
+      border-radius: 999px;
+      transition: width 0.15s linear;
+    }
+    .time-display {
+      font-size: 10px;
+      color: #9ca3af;
+      font-variant-numeric: tabular-nums;
+      min-width: 44px;
+    }
+    .big-button.playing .big-button-icon { border-color: #22c55e; color: #86efac; }
+    .choice:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .feedback {
+      font-size: 12px;
+      text-align: center;
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-top: 4px;
+      min-height: 36px;
+      display: none;
+    }
+    .feedback.visible { display: block; }
+    .feedback.correct { background: rgba(34,197,94,.12); color: #86efac; }
+    .feedback.wrong { background: rgba(239,68,68,.12); color: #fca5a5; }
+    .feedback-sub { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <header>
+      <div class="brand">EAR CHECK</div>
+      <div class="tagline">Spot the AI · One clip at a time</div>
+    </header>
+    <main>
+      <section class="center" aria-label="Current clip">
+        <div class="status" id="status">Rock · quick round</div>
+        <div class="big-button-wrap">
+          <div class="ring"></div>
+          <button type="button" class="big-button" id="playBtn" aria-label="Play / Pause">
+            <div class="big-button-icon">
+              <span id="playIcon">›</span>
+            </div>
+            <div class="big-button-label" id="playLabel">Tap to listen</div>
+          </button>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="time-display" id="timeDisplay">0:00 / 0:30</div>
+        </div>
+        <div class="track-meta">
+          <div class="track-meta-strong" id="trackTitle">—</div>
+          <div id="trackArtist">—</div>
+        </div>
+        <div class="choices">
+          <button class="choice" type="button" id="btnHuman" disabled aria-label="Guess human">
+            <span></span><span>Human</span>
+          </button>
+          <button class="choice primary" type="button" id="btnAI" disabled aria-label="Guess AI">
+            <span></span><span>AI</span>
+          </button>
+        </div>
+        <div class="feedback" id="feedback" role="status">
+          <div id="feedbackText"></div>
+          <div class="feedback-sub" id="feedbackSub"></div>
+        </div>
+      </section>
+      <section class="bottom">
+        <div class="bottom-left">
+          <div class="dot" id="streakDot"></div>
+          <span id="streakText">Streak 0</span>
+        </div>
+        <div class="bottom-right" id="scoreText">Score 0 / 0</div>
+      </section>
+    </main>
+  </div>
+  <audio id="audio" preload="metadata" crossorigin="anonymous"></audio>
+  <script>
+(function () {
+  console.log("[EarCheck] script running");
+  var API_BASE = "";
+  if (window.location.port && window.location.port !== "8000") {
+    API_BASE = window.location.protocol + "//" + window.location.hostname + ":8000";
+    console.log("[EarCheck] page not on 8000, using API_BASE:", API_BASE);
+  }
+  var LISTEN_SEC = 5;
+
+  const TRACKS = [
+    { deezerQuery: "AC/DC Back in Black", track: "Back in Black", artist: "AC/DC", isAI: false },
+    { deezerQuery: "Metallica Enter Sandman", track: "Enter Sandman", artist: "Metallica", isAI: true },
+    { deezerQuery: "Led Zeppelin Stairway to Heaven", track: "Stairway to Heaven", artist: "Led Zeppelin", isAI: false },
+    { deezerQuery: "Nirvana Smells Like Teen Spirit", track: "Smells Like Teen Spirit", artist: "Nirvana", isAI: false },
+    { deezerQuery: "AC/DC Highway to Hell", track: "Highway to Hell", artist: "AC/DC", isAI: true },
+    { deezerQuery: "Queen Bohemian Rhapsody", track: "Bohemian Rhapsody", artist: "Queen", isAI: true },
+  ];
+
+  let tracks = TRACKS.map(t => ({ ...t, audioUrl: "" }));
+  let currentIndex = 0;
+  let score = 0;
+  let answered = 0;
+  let streak = 0;
+  let answeredThis = false;
+  let listenTime = 0;
+
+  const audio = document.getElementById("audio");
+  const playBtn = document.getElementById("playBtn");
+  const playIcon = document.getElementById("playIcon");
+  const playLabel = document.getElementById("playLabel");
+  const progressFill = document.getElementById("progressFill");
+  const timeDisplay = document.getElementById("timeDisplay");
+  const trackTitle = document.getElementById("trackTitle");
+  const trackArtist = document.getElementById("trackArtist");
+  const btnHuman = document.getElementById("btnHuman");
+  const btnAI = document.getElementById("btnAI");
+  const feedback = document.getElementById("feedback");
+  const feedbackText = document.getElementById("feedbackText");
+  const feedbackSub = document.getElementById("feedbackSub");
+  const streakDot = document.getElementById("streakDot");
+  const streakText = document.getElementById("streakText");
+  const scoreText = document.getElementById("scoreText");
+
+  function fmtTime(s) {
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return m + ":" + String(sec).padStart(2, "0");
+  }
+
+  var FALLBACK_PREVIEWS = [
+    "https://cdns-preview-d.dzcdn.net/stream/c-deda7fa9316d9e9e880d2c6207e92260-5.mp3",
+    "https://cdns-preview-3.dzcdn.net/stream/c-3bba2a3d0d27e51f01e038a9cb8b21d4-5.mp3",
+    "https://cdns-preview-e.dzcdn.net/stream/c-e77d23e0c8b4b8b0f29f4b0ab97e1e75-8.mp3",
+  ];
+
+  function proxyUrl(u) {
+    var origin = window.location.origin;
+    try {
+      if (u.startsWith("http") && new URL(u).origin !== origin) {
+        return (API_BASE || origin) + "/v1/audio/proxy?url=" + encodeURIComponent(u);
+      }
+    } catch (e) {}
+    return u;
+  }
+
+  async function fetchPreviews() {
+    var url = (API_BASE || "") + "/v1/audio/preview/batch?q=" + encodeURIComponent(tracks.map(function(t) { return t.deezerQuery; }).join(","));
+    console.log("[EarCheck] fetchPreviews URL:", url);
+    try {
+      var resp = await fetch(url);
+      console.log("[EarCheck] fetch status:", resp.status);
+      if (!resp.ok) throw new Error(resp.status);
+      var data = await resp.json();
+      var results = data.results || data.previews || [];
+      console.log("[EarCheck] fetch results count:", results.length);
+      results.forEach(function(r, i) {
+        if (i < tracks.length && (r.preview_url || r.previewUrl)) tracks[i].audioUrl = proxyUrl(r.preview_url || r.previewUrl);
+      });
+      var loaded = tracks.filter(function(t) { return t.audioUrl; }).length;
+      if (loaded === 0 && FALLBACK_PREVIEWS.length > 0) {
+        console.warn("[EarCheck] no previews from API, using fallback URLs via proxy");
+        FALLBACK_PREVIEWS.forEach(function(u, i) { if (tracks[i]) tracks[i].audioUrl = proxyUrl(u); });
+      }
+    } catch (e) {
+      console.warn("[EarCheck] Previews fetch failed:", e.message);
+      FALLBACK_PREVIEWS.forEach(function(u, i) { if (tracks[i]) tracks[i].audioUrl = proxyUrl(u); });
+    }
+  }
+
+  function canGuess() {
+    return listenTime >= LISTEN_SEC && !answeredThis;
+  }
+
+  function updateUI() {
+    const t = tracks[currentIndex];
+    trackTitle.textContent = t.track || "—";
+    trackArtist.textContent = t.artist || "—";
+    const locked = !canGuess();
+    btnHuman.disabled = locked;
+    btnAI.disabled = locked;
+    streakText.textContent = "Streak " + streak;
+    scoreText.textContent = "Score " + score + " / " + answered;
+    streakDot.style.visibility = streak > 0 ? "visible" : "hidden";
+  }
+
+  function showFeedback(correct, actualAI) {
+    feedback.className = "feedback visible " + (correct ? "correct" : "wrong");
+    feedbackText.textContent = correct ? "Correct." : "Wrong.";
+    feedbackSub.textContent = actualAI ? "This one was AI-generated." : "This one was human.";
+  }
+
+  function setTrack() {
+    var t = tracks[currentIndex];
+    console.log("[EarCheck] setTrack", currentIndex, t.track, "audioUrl:", !!t.audioUrl);
+    feedback.classList.remove("visible");
+    answeredThis = false;
+    listenTime = 0;
+    progressFill.style.width = "0%";
+    timeDisplay.textContent = "0:00 / 0:30";
+    playBtn.classList.remove("playing");
+    playIcon.textContent = "›";
+    playLabel.textContent = "Tap to listen";
+    if (t.audioUrl && (t.audioUrl.startsWith("http") || t.audioUrl.startsWith("/v1/audio/proxy"))) {
+      audio.src = t.audioUrl;
+      audio.load();
+      console.log("[EarCheck] audio.src set to", t.audioUrl.substring(0, 80) + (t.audioUrl.length > 80 ? "..." : ""));
+    } else {
+      audio.removeAttribute("src");
+      if (t.audioUrl) console.warn("[EarCheck] skipped invalid audioUrl:", t.audioUrl.substring(0, 60));
+    }
+    updateUI();
+  }
+
+  function nextClip() {
+    currentIndex++;
+    if (currentIndex >= tracks.length) {
+      trackTitle.textContent = "Done";
+      trackArtist.textContent = "Final score: " + score + " / " + tracks.length;
+      playBtn.style.display = "none";
+      document.querySelector(".progress-wrap").style.display = "none";
+      btnHuman.style.display = "none";
+      btnAI.style.display = "none";
+      feedback.classList.remove("visible");
+      scoreText.textContent = "Score " + score + " / " + tracks.length;
+      return;
+    }
+    setTrack();
+  }
+
+  function onPlayClick() {
+    var t = tracks[currentIndex];
+    console.log("[EarCheck] onPlayClick", "audioUrl:", !!t.audioUrl, "paused:", audio.paused);
+    if (!t.audioUrl) { console.warn("[EarCheck] no audioUrl, ignoring play"); return; }
+    if (audio.paused) {
+      var p = audio.play();
+      if (p && typeof p.catch === "function") p.catch(function(err) { console.error("[EarCheck] play failed:", err); });
+      playBtn.classList.add("playing");
+      playIcon.textContent = "‖";
+      playLabel.textContent = "Pause";
+    } else {
+      audio.pause();
+      playBtn.classList.remove("playing");
+      playIcon.textContent = "›";
+      playLabel.textContent = "Tap to listen";
+    }
+  }
+
+  audio.addEventListener("timeupdate", function () {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    progressFill.style.width = pct + "%";
+    timeDisplay.textContent = fmtTime(audio.currentTime) + " / " + fmtTime(audio.duration);
+    listenTime = audio.currentTime;
+    updateUI();
+  });
+
+  audio.addEventListener("ended", function () {
+    playBtn.classList.remove("playing");
+    playIcon.textContent = "›";
+    playLabel.textContent = "Tap to listen";
+  });
+  audio.addEventListener("error", function () {
+    console.error("[EarCheck] audio error", audio.error ? (audio.error.code + " " + audio.error.message) : "unknown");
+  });
+
+  function guess(isAI) {
+    console.log("[EarCheck] guess", isAI ? "AI" : "Human", "canGuess:", canGuess());
+    if (!canGuess()) { console.warn("[EarCheck] canGuess false, ignoring"); return; }
+    var t = tracks[currentIndex];
+    const correct = (isAI && t.isAI) || (!isAI && !t.isAI);
+    answeredThis = true;
+    answered++;
+    if (correct) {
+      score++;
+      streak++;
+    } else {
+      streak = 0;
+    }
+    showFeedback(correct, t.isAI);
+    updateUI();
+    btnHuman.disabled = true;
+    btnAI.disabled = true;
+    setTimeout(nextClip, 1800);
+  }
+
+  var phoneEl = document.querySelector(".phone");
+  if (!phoneEl) {
+    console.error("[EarCheck] .phone not found");
+  } else {
+    console.log("[EarCheck] Attaching click/touchend to .phone");
+    phoneEl.addEventListener("click", function (e) {
+      var t = e.target;
+      console.log("[EarCheck] click", t.id || t.className || t.tagName, "target:", t);
+      if (t.closest("#playBtn")) { console.log("[EarCheck] -> play"); onPlayClick(); }
+      else if (t.closest("#btnHuman")) { console.log("[EarCheck] -> human"); guess(false); }
+      else if (t.closest("#btnAI")) { console.log("[EarCheck] -> AI"); guess(true); }
+      else console.log("[EarCheck] click not on a button");
+    });
+    phoneEl.addEventListener("touchend", function (e) {
+      var t = e.target;
+      console.log("[EarCheck] touchend", t.id || t.className || t.tagName);
+      if (t.closest("#playBtn")) { e.preventDefault(); console.log("[EarCheck] -> play (touch)"); onPlayClick(); }
+      else if (t.closest("#btnHuman")) { e.preventDefault(); console.log("[EarCheck] -> human (touch)"); guess(false); }
+      else if (t.closest("#btnAI")) { e.preventDefault(); console.log("[EarCheck] -> AI (touch)"); guess(true); }
+    }, { passive: false });
+  }
+
+  (async function init() {
+    console.log("[EarCheck] init start");
+    await fetchPreviews();
+    var withAudio = tracks.filter(function(t) { return t.audioUrl; }).length;
+    console.log("[EarCheck] previews loaded:", withAudio, "/", tracks.length);
+    setTrack();
+    console.log("[EarCheck] init done, current track audioUrl:", tracks[currentIndex].audioUrl ? "yes" : "no");
+  })();
+})();
+  </script>
+</body>
+</html>
+
