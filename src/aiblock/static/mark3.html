@@ -414,17 +414,19 @@
     feedback.className = "feedback visible " + (correct ? "correct" : "wrong");
 
     var conf = typeof t.confidence === "number" ? t.confidence : 1.0;
-    var band = "";
-    if (conf >= 0.85) band = "Very likely ";
-    else if (conf >= 0.6) band = "Leaning ";
-    else band = "Too close to call — ";
+    var pct = Math.round(conf * 100);
+    var band;
+    if (conf >= 0.85) band = "Very likely";
+    else if (conf >= 0.6) band = "Leaning";
+    else band = "Uncertain";
 
+    var baseLabel = actualAI ? "AI" : "human";
     if (conf < 0.6) {
-      feedbackText.textContent = band + (actualAI ? "even our detector isn't sure, but we call this AI." : "even our detector isn't sure, but we call this human.");
+      feedbackText.textContent = (correct ? "Correct. " : "Tough one. ") +
+        band + " " + baseLabel + " (" + pct + "% model confidence).";
     } else {
-      feedbackText.textContent = (correct
-        ? (actualAI ? band + "AI — nice catch." : band + "human — you spotted the real one.")
-        : (actualAI ? band + "AI, but it fooled you this time." : band + "human, but it fooled you this time."));
+      feedbackText.textContent = (correct ? "Correct. " : "Off this time. ") +
+        band + " " + baseLabel + " (" + pct + "% model confidence).";
     }
 
     var mainLine = actualAI ? "AI: " : "Human: ";
@@ -542,6 +544,7 @@
       if (t.closest("#playBtn")) { console.log("[EarCheck] -> play"); onPlayClick(); }
       else if (t.closest("#btnHuman")) { console.log("[EarCheck] -> human"); guess(false); }
       else if (t.closest("#btnAI")) { console.log("[EarCheck] -> AI"); guess(true); }
+      else if (t.closest("#nextBtn")) { console.log("[EarCheck] -> next"); nextClip(); }
       else console.log("[EarCheck] click not on a button");
     });
     phoneEl.addEventListener("touchend", function (e) {
@@ -550,6 +553,7 @@
       if (t.closest("#playBtn")) { e.preventDefault(); console.log("[EarCheck] -> play (touch)"); onPlayClick(); }
       else if (t.closest("#btnHuman")) { e.preventDefault(); console.log("[EarCheck] -> human (touch)"); guess(false); }
       else if (t.closest("#btnAI")) { e.preventDefault(); console.log("[EarCheck] -> AI (touch)"); guess(true); }
+      else if (t.closest("#nextBtn")) { e.preventDefault(); console.log("[EarCheck] -> next (touch)"); nextClip(); }
     }, { passive: false });
   }
 
