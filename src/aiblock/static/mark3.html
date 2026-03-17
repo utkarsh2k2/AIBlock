@@ -369,6 +369,7 @@
   const streakText = document.getElementById("streakText");
   const scoreText = document.getElementById("scoreText");
   const nextBtn = document.getElementById("nextBtn");
+  var lastKnownDuration = null;
 
   function fmtTime(s) {
     const m = Math.floor(s / 60);
@@ -393,7 +394,15 @@
   }
 
   async function fetchPreviews() {
-    var url = (API_BASE || "") + "/v1/audio/preview/batch?q=" + encodeURIComponent(tracks.map(function(t) { return t.deezerQuery; }).join(","));
+    var queries = tracks
+      .filter(function (t) { return t.deezerQuery && !t.audioUrl; })
+      .map(function (t) { return t.deezerQuery; })
+      .join(",");
+    if (!queries) {
+      console.log("[EarCheck] fetchPreviews: no Deezer queries needed");
+      return;
+    }
+    var url = (API_BASE || "") + "/v1/audio/preview/batch?q=" + encodeURIComponent(queries);
     console.log("[EarCheck] fetchPreviews URL:", url);
     try {
       var resp = await fetch(url);
@@ -402,8 +411,10 @@
       var data = await resp.json();
       var results = data.results || data.previews || [];
       console.log("[EarCheck] fetch results count:", results.length);
-      results.forEach(function(r, i) {
-        if (i < tracks.length && (r.preview_url || r.previewUrl)) tracks[i].audioUrl = proxyUrl(r.preview_url || r.previewUrl);
+      // Map results back in order of the filtered list
+      var target = tracks.filter(function (t) { return t.deezerQuery && !t.audioUrl; });
+      results.forEach(function (r, i) {
+        if (i < target.length && (r.preview_url || r.previewUrl)) target[i].audioUrl = proxyUrl(r.preview_url || r.previewUrl);
       });
       var loaded = tracks.filter(function(t) { return t.audioUrl; }).length;
       if (loaded === 0 && FALLBACK_PREVIEWS.length > 0) {
@@ -422,8 +433,14 @@
 
   function updateUI() {
     const t = tracks[currentIndex];
-    trackTitle.textContent = t.track || "—";
-    trackArtist.textContent = t.artist || "—";
+    // Don't reveal identity before the guess.
+    if (answeredThis) {
+      trackTitle.textContent = t.track || "—";
+      trackArtist.textContent = t.artist || "—";
+    } else {
+      trackTitle.textContent = t.displayLabel || "Clip";
+      trackArtist.textContent = "Listen, then guess";
+    }
     const locked = !canGuess();
     btnHuman.disabled = locked;
     btnAI.disabled = locked;
@@ -477,6 +494,7 @@
     answeredThis = false;
     listenTime = 0;
     progressFill.style.width = "0%";
+    lastKnownDuration = null;
     timeDisplay.textContent = "0:00 / --:--";
     playBtn.classList.remove("playing");
     playIcon.textContent = "›";
@@ -529,17 +547,44 @@
   }
 
   audio.addEventListener("timeupdate", function () {
+    // Duration can be NaN until metadata is loaded; avoid NaN in UI.
     if (!audio.duration || !isFinite(audio.duration)) {
-      timeDisplay.textContent = fmtTime(audio.currentTime) + " / --:--";
+      // If we already learned duration once, keep using it.
+      if (lastKnownDuration && isFinite(lastKnownDuration)) {
+        const pct = (audio.currentTime / lastKnownDuration) * 100;
+        progressFill.style.width = pct + "%";
+        timeDisplay.textContent = fmtTime(audio.currentTime) + " / " + fmtTime(lastKnownDuration);
+      } else {
+        // Deezer previews are typically ~30s; show a sane placeholder instead of --:--
+        const assumed = 30;
+        const pct = (audio.currentTime / assumed) * 100;
+        progressFill.style.width = pct + "%";
+        timeDisplay.textContent = fmtTime(audio.currentTime) + " / " + fmtTime(assumed);
+      }
       listenTime = audio.currentTime;
       updateUI();
       return;
     }
+    lastKnownDuration = audio.duration;
     const pct = (audio.currentTime / audio.duration) * 100;
     progressFill.style.width = pct + "%";
     timeDisplay.textContent = fmtTime(audio.currentTime) + " / " + fmtTime(audio.duration);
     listenTime = audio.currentTime;
     updateUI();
+  });
+
+  audio.addEventListener("loadedmetadata", function () {
+    if (audio.duration && isFinite(audio.duration)) {
+      lastKnownDuration = audio.duration;
+      // Update the UI immediately with total duration
+      timeDisplay.textContent = fmtTime(audio.currentTime || 0) + " / " + fmtTime(audio.duration);
+    }
+  });
+
+  audio.addEventListener("durationchange", function () {
+    if (audio.duration && isFinite(audio.duration)) {
+      lastKnownDuration = audio.duration;
+    }
   });
 
   audio.addEventListener("ended", function () {
@@ -610,8 +655,10 @@
       if (!resp.ok) throw new Error("HTTP " + resp.status);
       const data = await resp.json();
       tracks = data.map(function (item) {
+        var directAudio = item.audio_url ? proxyUrl(item.audio_url) : "";
         return {
-          deezerQuery: item.deezer_query,
+          deezerQuery: item.deezer_query || "",
+          displayLabel: item.display_label || "",
           track: item.title,
           artist: item.artist,
           isAI: !!item.is_ai_label,
@@ -620,7 +667,7 @@
           tip: item.tip || "",
           sources: item.sources || [],
           confidence: typeof item.confidence === "number" ? item.confidence : 1.0,
-          audioUrl: ""  // filled by fetchPreviews
+          audioUrl: directAudio  // if empty, filled by fetchPreviews
         };
       });
       console.log("[EarCheck] loaded manifest tracks:", tracks.length);
