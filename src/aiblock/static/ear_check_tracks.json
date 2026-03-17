@@ -1,7 +1,7 @@
 [
   {
     "id": "back_in_black",
-    "display_label": "Rock · easy",
+    "display_label": "",
     "title": "Back in Black",
     "artist": "AC/DC",
     "deezer_query": "AC/DC Back in Black",
@@ -12,10 +12,7 @@
       "The drums are not machine-perfect – tiny rush/drag in the groove.",
       "Faint room noise and cymbal decay between hits."
     ],
-    "sources": [
-      { "label": "Album on Wikipedia", "url": "https://en.wikipedia.org/wiki/Back_in_Black" },
-      { "label": "AC/DC official", "url": "https://www.acdc.com/" }
-    ],
+    "sources": [],
     "tip": "Slight rushing and dragging of the drums instead of a metronome-perfect loop.",
     "ai_score": 0.1,
     "confidence": 0.85
@@ -43,7 +40,7 @@
   },
   {
     "id": "stairway_human",
-    "display_label": "Rock · medium",
+    "display_label": "",
     "title": "Stairway to Heaven",
     "artist": "Led Zeppelin",
     "deezer_query": "Led Zeppelin Stairway to Heaven",
@@ -54,9 +51,7 @@
       "Acoustic guitar pick noise that changes from note to note.",
       "The tempo gently pushes and relaxes as the song builds."
     ],
-    "sources": [
-      { "label": "Song on Wikipedia", "url": "https://en.wikipedia.org/wiki/Stairway_to_Heaven" }
-    ],
+    "sources": [],
     "tip": "Small changes in pick attack and tempo as the part gets louder.",
     "ai_score": 0.2,
     "confidence": 0.7
@@ -84,7 +79,7 @@
   },
   {
     "id": "bohemian_rhapsody_ai",
-    "display_label": "Rock · hard",
+    "display_label": "",
     "title": "Bohemian Rhapsody (AI)",
     "artist": "Queen",
     "deezer_query": "Queen Bohemian Rhapsody",
@@ -95,16 +90,14 @@
       "Choir harmonies that sound like one voice copied many times.",
       "Very little wobble or timing drift between harmony parts."
     ],
-    "sources": [
-      { "label": "Song on Wikipedia", "url": "https://en.wikipedia.org/wiki/Bohemian_Rhapsody" }
-    ],
+    "sources": [],
     "tip": "Stacked parts that feel like carbon copies instead of a messy group of singers.",
     "ai_score": 0.86,
     "confidence": 0.65
   },
   {
     "id": "smells_like_teen_spirit",
-    "display_label": "Rock · hard",
+    "display_label": "",
     "title": "Smells Like Teen Spirit",
     "artist": "Nirvana",
     "deezer_query": "Nirvana Smells Like Teen Spirit",
@@ -115,9 +108,7 @@
       "Screamed lines that change rasp and loudness from phrase to phrase.",
       "Guitars and drums that get slightly wilder instead of looping perfectly."
     ],
-    "sources": [
-      { "label": "Song on Wikipedia", "url": "https://en.wikipedia.org/wiki/Smells_Like_Teen_Spirit" }
-    ],
+    "sources": [],
     "tip": "Uneven rasp and intensity that a clone would usually smooth out.",
     "ai_score": 0.3,
     "confidence": 0.55
