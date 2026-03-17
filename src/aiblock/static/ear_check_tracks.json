@@ -7,8 +7,15 @@
     "platform": "deezer",
     "is_ai_label": false,
     "difficulty": "easy",
-    "reason": "Classic studio master with natural drum bleed and slight timing drift.",
-    "tip": "Listen for room noise and tiny imperfections instead of metronome-perfect hits.",
+    "listen_for": [
+      "The drums are not machine-perfect – tiny rush/drag in the groove.",
+      "Faint room noise and cymbal decay between hits."
+    ],
+    "sources": [
+      { "label": "Album on Wikipedia", "url": "https://en.wikipedia.org/wiki/Back_in_Black" },
+      { "label": "AC/DC official", "url": "https://www.acdc.com/" }
+    ],
+    "tip": "Slight rushing and dragging of the drums instead of a metronome-perfect loop.",
     "ai_score": 0.1,
     "confidence": 0.85
   },
@@ -20,8 +27,15 @@
     "platform": "deezer",
     "is_ai_label": true,
     "difficulty": "easy",
-    "reason": "Vocals and guitars are locked to the grid with almost no breath noise.",
-    "tip": "AI clones often sound too clean and consistent across every phrase.",
+    "listen_for": [
+      "Every vocal phrase lands the same way with almost no breathing in between.",
+      "Palm-muted guitars hit the grid with identical attack each time."
+    ],
+    "sources": [
+      { "label": "Song on Wikipedia", "url": "https://en.wikipedia.org/wiki/Enter_Sandman" },
+      { "label": "Metallica official", "url": "https://www.metallica.com/" }
+    ],
+    "tip": "Overly clean, perfectly repeated phrases with almost no breath noise.",
     "ai_score": 0.9,
     "confidence": 0.88
   },
@@ -33,8 +47,14 @@
     "platform": "deezer",
     "is_ai_label": false,
     "difficulty": "medium",
-    "reason": "Guitar dynamics and pick noise build gradually in a very human way.",
-    "tip": "Humans naturally push and pull tempo as a song swells.",
+    "listen_for": [
+      "Acoustic guitar pick noise that changes from note to note.",
+      "The tempo gently pushes and relaxes as the song builds."
+    ],
+    "sources": [
+      { "label": "Song on Wikipedia", "url": "https://en.wikipedia.org/wiki/Stairway_to_Heaven" }
+    ],
+    "tip": "Small changes in pick attack and tempo as the part gets louder.",
     "ai_score": 0.2,
     "confidence": 0.7
   },
@@ -46,8 +66,14 @@
     "platform": "deezer",
     "is_ai_label": true,
     "difficulty": "medium",
-    "reason": "The rasp is close but the phrasing is too even and never fully strains.",
-    "tip": "Cloned voices mimic timbre but struggle with natural strain and fatigue.",
+    "listen_for": [
+      "Rasp that sounds the same on every chorus line.",
+      "High notes never quite sound strained or tired."
+    ],
+    "sources": [
+      { "label": "Album on Wikipedia", "url": "https://en.wikipedia.org/wiki/Highway_to_Hell" }
+    ],
+    "tip": "A cloned voice that keeps the same rasp and power all the way through.",
     "ai_score": 0.82,
     "confidence": 0.78
   },
@@ -59,8 +85,14 @@
     "platform": "deezer",
     "is_ai_label": true,
     "difficulty": "hard",
-    "reason": "Stacked harmonies are perfectly balanced with almost no wobble between parts.",
-    "tip": "AI choirs often sound like one voice copied many times instead of a messy group.",
+    "listen_for": [
+      "Choir harmonies that sound like one voice copied many times.",
+      "Very little wobble or timing drift between harmony parts."
+    ],
+    "sources": [
+      { "label": "Song on Wikipedia", "url": "https://en.wikipedia.org/wiki/Bohemian_Rhapsody" }
+    ],
+    "tip": "Stacked parts that feel like carbon copies instead of a messy group of singers.",
     "ai_score": 0.86,
     "confidence": 0.65
   },
@@ -72,8 +104,14 @@
     "platform": "deezer",
     "is_ai_label": false,
     "difficulty": "hard",
-    "reason": "Vocal rasp and uneven scream intensity are classic Cobain, not a smooth clone.",
-    "tip": "AI vocals tend to keep the same tone and intensity on every line.",
+    "listen_for": [
+      "Screamed lines that change rasp and loudness from phrase to phrase.",
+      "Guitars and drums that get slightly wilder instead of looping perfectly."
+    ],
+    "sources": [
+      { "label": "Song on Wikipedia", "url": "https://en.wikipedia.org/wiki/Smells_Like_Teen_Spirit" }
+    ],
+    "tip": "Uneven rasp and intensity that a clone would usually smooth out.",
     "ai_score": 0.3,
     "confidence": 0.55
   }
