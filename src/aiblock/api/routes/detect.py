@@ -201,6 +201,30 @@ async def detect_sync(
 
     result.update({"url": body.url, "platform": platform, "use_model": body.use_model})
 
+    # Build a stable, UI-friendly envelope while preserving legacy keys.
+    is_ai = result.get("is_ai")
+    ai_score = float(result.get("ai_score", result.get("score", 0.5)))
+    confidence = float(result.get("confidence", 0.0))
+    detailed_scores = result.get("detailed_scores") or {}
+    thresholds = result.get("thresholds") or {}
+
+    wrapped = {
+        "is_ai": is_ai,
+        "ai_score": ai_score,
+        "confidence": confidence,
+        "platform_info": {
+            "url": body.url,
+            "platform": platform,
+            "use_model": body.use_model,
+        },
+        "detailed_scores": detailed_scores,
+        "thresholds": thresholds,
+    }
+
+    # Merge legacy fields so existing clients that expect the old dict still work.
+    wrapped.update(result)
+    result = wrapped
+
     # Record job + usage in DB
     job = DetectionJob(
         api_key_id=key.id,

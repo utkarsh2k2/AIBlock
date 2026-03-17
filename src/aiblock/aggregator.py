@@ -2,6 +2,11 @@ import numpy as np
 
 from aiblock.detectors.base import DetectionResult
 
+# Global thresholds for downstream consumers (labeling, UI buckets)
+AI_STRICT = 0.8
+HUMAN_STRICT = 0.2
+GAME_CUTOFF = 0.5
+
 
 def aggregate(
     results: list[list[DetectionResult]],
@@ -104,4 +109,9 @@ def aggregate(
         "confidence": round(confidence, 4),
         "chunks": len(results),
         "detailed_scores": detailed_scores,
+        "thresholds": {
+            "ai_strict": AI_STRICT,
+            "human_strict": HUMAN_STRICT,
+            "game_cutoff": GAME_CUTOFF,
+        },
     }

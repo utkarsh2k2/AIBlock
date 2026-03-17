@@ -1,0 +1,81 @@
+[
+  {
+    "id": "back_in_black",
+    "title": "Back in Black",
+    "artist": "AC/DC",
+    "deezer_query": "AC/DC Back in Black",
+    "platform": "deezer",
+    "is_ai_label": false,
+    "difficulty": "easy",
+    "reason": "Classic studio master with natural drum bleed and slight timing drift.",
+    "tip": "Listen for room noise and tiny imperfections instead of metronome-perfect hits.",
+    "ai_score": 0.1,
+    "confidence": 0.85
+  },
+  {
+    "id": "enter_sandman_ai",
+    "title": "Enter Sandman (AI clone)",
+    "artist": "Metallica",
+    "deezer_query": "Metallica Enter Sandman",
+    "platform": "deezer",
+    "is_ai_label": true,
+    "difficulty": "easy",
+    "reason": "Vocals and guitars are locked to the grid with almost no breath noise.",
+    "tip": "AI clones often sound too clean and consistent across every phrase.",
+    "ai_score": 0.9,
+    "confidence": 0.88
+  },
+  {
+    "id": "stairway_human",
+    "title": "Stairway to Heaven",
+    "artist": "Led Zeppelin",
+    "deezer_query": "Led Zeppelin Stairway to Heaven",
+    "platform": "deezer",
+    "is_ai_label": false,
+    "difficulty": "medium",
+    "reason": "Guitar dynamics and pick noise build gradually in a very human way.",
+    "tip": "Humans naturally push and pull tempo as a song swells.",
+    "ai_score": 0.2,
+    "confidence": 0.7
+  },
+  {
+    "id": "highway_to_hell_ai",
+    "title": "Highway to Hell (AI)",
+    "artist": "AC/DC",
+    "deezer_query": "AC/DC Highway to Hell",
+    "platform": "deezer",
+    "is_ai_label": true,
+    "difficulty": "medium",
+    "reason": "The rasp is close but the phrasing is too even and never fully strains.",
+    "tip": "Cloned voices mimic timbre but struggle with natural strain and fatigue.",
+    "ai_score": 0.82,
+    "confidence": 0.78
+  },
+  {
+    "id": "bohemian_rhapsody_ai",
+    "title": "Bohemian Rhapsody (AI)",
+    "artist": "Queen",
+    "deezer_query": "Queen Bohemian Rhapsody",
+    "platform": "deezer",
+    "is_ai_label": true,
+    "difficulty": "hard",
+    "reason": "Stacked harmonies are perfectly balanced with almost no wobble between parts.",
+    "tip": "AI choirs often sound like one voice copied many times instead of a messy group.",
+    "ai_score": 0.86,
+    "confidence": 0.65
+  },
+  {
+    "id": "smells_like_teen_spirit",
+    "title": "Smells Like Teen Spirit",
+    "artist": "Nirvana",
+    "deezer_query": "Nirvana Smells Like Teen Spirit",
+    "platform": "deezer",
+    "is_ai_label": false,
+    "difficulty": "hard",
+    "reason": "Vocal rasp and uneven scream intensity are classic Cobain, not a smooth clone.",
+    "tip": "AI vocals tend to keep the same tone and intensity on every line.",
+    "ai_score": 0.3,
+    "confidence": 0.55
+  }
+]
+
