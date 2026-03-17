@@ -1,6 +1,7 @@
 [
   {
     "id": "back_in_black",
+    "display_label": "Rock · easy",
     "title": "Back in Black",
     "artist": "AC/DC",
     "deezer_query": "AC/DC Back in Black",
@@ -21,26 +22,28 @@
   },
   {
     "id": "enter_sandman_ai",
-    "title": "Enter Sandman (AI clone)",
-    "artist": "Metallica",
-    "deezer_query": "Metallica Enter Sandman",
-    "platform": "deezer",
+    "display_label": "Rock · easy",
+    "title": "Rocky (AI-native)",
+    "artist": "SunoCC (Suno AI)",
+    "audio_url": "https://storage.sunocc.com/audio/c7221e360b126e73e47ab61686d0a410/MDdmOTZkZTYtYWUwMC00MzBhLThkZTktNTgwMjJjNTY0YjYz.mp3",
+    "platform": "sunocc",
     "is_ai_label": true,
     "difficulty": "easy",
     "listen_for": [
-      "Every vocal phrase lands the same way with almost no breathing in between.",
-      "Palm-muted guitars hit the grid with identical attack each time."
+      "Repeated patterns that sound identical each time (no natural variation).",
+      "Cymbals/hi-hats that feel overly consistent and slightly 'plastic'."
     ],
     "sources": [
-      { "label": "Song on Wikipedia", "url": "https://en.wikipedia.org/wiki/Enter_Sandman" },
-      { "label": "Metallica official", "url": "https://www.metallica.com/" }
+      { "label": "Track page (SunoCC)", "url": "https://sunocc.com/music/363728" },
+      { "label": "SunoCC", "url": "https://sunocc.com/" }
     ],
-    "tip": "Overly clean, perfectly repeated phrases with almost no breath noise.",
+    "tip": "Listen for parts that repeat with near-identical timing and tone every time.",
     "ai_score": 0.9,
     "confidence": 0.88
   },
   {
     "id": "stairway_human",
+    "display_label": "Rock · medium",
     "title": "Stairway to Heaven",
     "artist": "Led Zeppelin",
     "deezer_query": "Led Zeppelin Stairway to Heaven",
@@ -60,25 +63,28 @@
   },
   {
     "id": "highway_to_hell_ai",
-    "title": "Highway to Hell (AI)",
-    "artist": "AC/DC",
-    "deezer_query": "AC/DC Highway to Hell",
-    "platform": "deezer",
+    "display_label": "Rock · medium",
+    "title": "rock stare (AI-native)",
+    "artist": "SunoCC (Suno AI)",
+    "audio_url": "https://storage.sunocc.com/audio/97239cc99b9fb354149be2696a045c0c/32c22cdc-a698-4e91-91b5-b93cf5ec6290.mp3",
+    "platform": "sunocc",
     "is_ai_label": true,
     "difficulty": "medium",
     "listen_for": [
-      "Rasp that sounds the same on every chorus line.",
-      "High notes never quite sound strained or tired."
+      "Vocals that stay oddly steady in tone and intensity through the whole line.",
+      "Guitar attacks that feel uniformly shaped (less messy transient detail)."
     ],
     "sources": [
-      { "label": "Album on Wikipedia", "url": "https://en.wikipedia.org/wiki/Highway_to_Hell" }
+      { "label": "Track page (SunoCC)", "url": "https://sunocc.com/music/227789" },
+      { "label": "SunoCC", "url": "https://sunocc.com/" }
     ],
-    "tip": "A cloned voice that keeps the same rasp and power all the way through.",
+    "tip": "Listen for vocals that feel 'leveled' and consistent instead of straining naturally.",
     "ai_score": 0.82,
     "confidence": 0.78
   },
   {
     "id": "bohemian_rhapsody_ai",
+    "display_label": "Rock · hard",
     "title": "Bohemian Rhapsody (AI)",
     "artist": "Queen",
     "deezer_query": "Queen Bohemian Rhapsody",
@@ -98,6 +104,7 @@
   },
   {
     "id": "smells_like_teen_spirit",
+    "display_label": "Rock · hard",
     "title": "Smells Like Teen Spirit",
     "artist": "Nirvana",
     "deezer_query": "Nirvana Smells Like Teen Spirit",

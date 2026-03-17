@@ -126,7 +126,7 @@ async def audio_proxy(url: str = Query(..., description="Audio URL to stream")):
 
 @app.get("/home", include_in_schema=False)
 async def home():
-    return _static_file("ai-or-not.html")
+    return _static_file("mark3.html")
 
 @app.get("/game", include_in_schema=False)
 async def game():
