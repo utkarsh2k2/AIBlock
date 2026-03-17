@@ -499,7 +499,15 @@
 
   function onPlayClick() {
     var t = tracks[currentIndex];
-    console.log("[EarCheck] onPlayClick", "audioUrl:", !!t.audioUrl, "paused:", audio.paused);
+    console.log("[EarCheck] onPlayClick", "audioUrl:", !!t.audioUrl, "paused:", audio.paused, "answeredThis:", answeredThis);
+
+    // After you've answered, the big button advances to the next clip so the
+    // AI/Human reveal stays on screen until you choose to move on.
+    if (answeredThis) {
+      nextClip();
+      return;
+    }
+
     if (!t.audioUrl) { console.warn("[EarCheck] no audioUrl, ignoring play"); return; }
     if (audio.paused) {
       var p = audio.play();
@@ -550,7 +558,6 @@
     updateUI();
     btnHuman.disabled = true;
     btnAI.disabled = true;
-    setTimeout(nextClip, 1800);
   }
 
   var phoneEl = document.querySelector(".phone");
