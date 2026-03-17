@@ -6,6 +6,7 @@ RUN pip install --no-cache-dir fastapi "uvicorn[standard]" httpx
 
 COPY src/ src/
 COPY minimal_server.py .
+COPY ai-or-not.html .
 
 EXPOSE 8000
 

@@ -1,4 +1,5 @@
 """Minimal server for testing without DB/Redis."""
+import os
 import pathlib
 from urllib.parse import urlparse
 
@@ -24,6 +25,15 @@ app.add_middleware(
 app.include_router(router)
 app.mount("/static", StaticFiles(directory=_static_dir), name="static")
 
+_HEALTH = {"status": "ok", "app": "AI or Not"}
+
+@app.get("/")
+async def root():
+    return _HEALTH
+
+@app.get("/health")
+async def health():
+    return _HEALTH
 
 # Known sample paths used by work1/other UIs -> Deezer 30s preview URL
 _PREVIEW_SAMPLE_URLS = {
@@ -67,21 +77,25 @@ async def audio_proxy(url: str = Query(..., description="Audio URL to stream")):
             headers={"Accept-Ranges": "bytes"},
         )
 
-@app.get("/home")
-async def read_root():
+@app.get("/home", include_in_schema=False)
+async def home():
     return FileResponse(_static_dir / "ai-or-not.html")
-
 
 @app.get("/game", include_in_schema=False)
 async def game():
     return FileResponse(_static_dir / "fake-or-real.html")
 
-
 @app.get("/mark2", include_in_schema=False)
 async def mark2():
     return FileResponse(_static_dir / "mark2.html")
 
-
 @app.get("/mark3", include_in_schema=False)
 async def mark3():
     return FileResponse(_static_dir / "mark3.html")
+
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

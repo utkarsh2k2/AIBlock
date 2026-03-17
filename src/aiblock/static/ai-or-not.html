@@ -244,7 +244,7 @@
 
 <script>
 // ===== CONFIG =====
-const API_BASE = ""; // Your AIBlock backend URL
+const API_BASE = ""; // same origin
 
 const tracks=[
   {track:"Back in Black",artist:"AC/DC",duration:"4:15",year:"1980",isAI:false,
@@ -308,26 +308,25 @@ const tracks=[
 async function fetchPreviews(){
   const queries = tracks.map(t => t.deezerQuery).join(",");
   try {
-    const resp = await fetch(`${API_BASE}/v1/audio/preview/batch?queries=${encodeURIComponent(queries)}`);
+    const resp = await fetch(`${API_BASE}/v1/audio/preview/batch?q=${encodeURIComponent(queries)}`);
     if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
-    if(data.previews){
-      data.previews.forEach((p, i) => {
+    if(data.results){
+      data.results.forEach((p, i) => {
         if(p.preview_url && i < tracks.length){
           tracks[i].audioUrl = p.preview_url;
-          // Update duration from Deezer's actual data
           if(p.duration) tracks[i].duration = fmtTime(p.duration);
         }
       });
     }
-    console.log(`Loaded ${data.previews.filter(p=>p.preview_url).length} Deezer previews`);
+    console.log(`Loaded ${(data.results||[]).filter(p=>p.preview_url).length} Deezer previews`);
   } catch(e){
     console.warn("Could not fetch Deezer previews from backend:", e.message);
     console.log("Falling back to simulated playback. Make sure your backend is running at", API_BASE);
   }
 }
 
-let currentIndex=0,streak=0,results=[],activeCard=null,audioPlayers={};
+let currentIndex=0,streak=0,results=[],activeCard=null,audioPlayers={},listenWallTimers={};
 
 function createCards(){
   const area=document.getElementById('cardArea');
@@ -413,13 +412,21 @@ function togglePlay(idx){
     Object.entries(audioPlayers).forEach(([k,a])=>{
       if(k!=idx&&!a.paused){a.pause();document.getElementById('pb-'+k).innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';document.getElementById('ac-'+k).classList.remove('playing')}
     });
-    audio.play();
+    audio.play().catch(()=>{});
     btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     ac.classList.add('playing');
+    if(!listenWallTimers[idx]){
+      listenWallTimers[idx]=setInterval(()=>{
+        listenTime[idx]=(listenTime[idx]||0)+0.2;
+        updateListenLock(idx);
+        if(listenTime[idx]>=5){clearInterval(listenWallTimers[idx]);delete listenWallTimers[idx];}
+      },200);
+    }
   } else {
     audio.pause();
     btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
     ac.classList.remove('playing');
+    clearInterval(listenWallTimers[idx]);delete listenWallTimers[idx];
   }
 }
 
@@ -494,6 +501,7 @@ function stopAll(){
   Object.values(audioPlayers).forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}});
   audioPlayers={};
   Object.keys(simTimers).forEach(k=>clearInterval(simTimers[k]));simState={};simTimers={};
+  Object.keys(listenWallTimers).forEach(k=>clearInterval(listenWallTimers[k]));listenWallTimers={};
   listenTime={};
 }
 

@@ -186,9 +186,11 @@
   let score = 0;
   let answered = false;
 
+  const API_BASE = '';
+
   async function loadTracks() {
     const allQueries = [...REAL_QUERIES, ...FAKE_QUERIES].join(",");
-    const url = `/v1/audio/preview/batch?q=${encodeURIComponent(allQueries)}`;
+    const url = `${API_BASE}/v1/audio/preview/batch?q=${encodeURIComponent(allQueries)}`;
 
     try {
       const resp = await fetch(url);
